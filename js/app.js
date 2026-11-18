@@ -171,31 +171,15 @@
     // The theme is stored in LocalStorage through settings.
     // ----------------------------------------------------------
 
-    function applyTheme(theme) {
-        const selectedTheme = theme || config.defaultTheme;
-
-        // Set the theme attribute on the document
-        document.documentElement.setAttribute(
-            "data-theme",
-            selectedTheme
-        );
-
-        // Toggle theme classes for compatibility with CSS
-        document.documentElement.classList.remove(
-            "theme-dark",
-            "theme-light"
-        );
-
-        document.documentElement.classList.add(
-            `theme-${selectedTheme}`
-        );
-
-        // Update theme toggle buttons if they exist
-        updateThemeButtons(selectedTheme);
-
-        return selectedTheme;
+  function applyTheme(theme) {
+    if (window.VelvetTheme) {
+        return VelvetTheme.applyTheme(theme);
     }
 
+    document.documentElement.setAttribute("data-theme", theme);
+
+    return theme;
+}
     // ----------------------------------------------------------
     // 9. UPDATE THEME BUTTONS
     // ----------------------------------------------------------
@@ -233,27 +217,20 @@
     // Switches between light and dark mode.
     // ----------------------------------------------------------
 
-    function toggleTheme() {
-        const currentTheme =
-            document.documentElement.getAttribute("data-theme") ||
-            config.defaultTheme;
-
-        const newTheme =
-            currentTheme === "dark" ? "light" : "dark";
-
-        // Apply the new theme
-        applyTheme(newTheme);
-
-        // Save the preference
-        save({
-            settings: {
-                ...state.data.settings,
-                theme: newTheme
-            }
-        });
-
-        return newTheme;
+ function toggleTheme() {
+    if (window.VelvetTheme) {
+        return VelvetTheme.toggleTheme();
     }
+
+    const currentTheme =
+        document.documentElement.getAttribute("data-theme") || "dark";
+
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+    applyTheme(newTheme);
+
+    return newTheme;
+}
 
     // ----------------------------------------------------------
     // 11. NAVIGATION
