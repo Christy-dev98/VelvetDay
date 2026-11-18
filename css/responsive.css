@@ -1,0 +1,1147 @@
+
+/* =========================================================
+   VELVET DAY ♡
+   RESPONSIVE STYLESHEET
+
+   This file adapts the application to:
+   - Desktop
+   - Laptop
+   - Tablet
+   - Mobile
+
+   It does not replace style.css.
+   It overrides styles only when the screen size requires it.
+========================================================= */
+
+
+/* =========================================================
+   1. LARGE DESKTOPS
+   Screens wider than 1440px
+========================================================= */
+
+@media (min-width: 1440px) {
+
+    /* Give the dashboard more room on large screens */
+    .page-content {
+        padding: 40px 50px 60px;
+    }
+
+    /* Allow the cards to breathe */
+    .dashboard-grid {
+        gap: 24px;
+    }
+
+    .dashboard-card {
+        padding: 27px;
+    }
+
+    /* Wider task cards */
+    .task-item {
+        padding: 16px;
+    }
+
+}
+
+
+/* =========================================================
+   2. LAPTOPS
+   Screens up to 1200px
+========================================================= */
+
+@media (max-width: 1200px) {
+
+    /* Reduce sidebar width */
+    :root {
+        --sidebar-width: 220px;
+    }
+
+    /* Reduce main content spacing */
+    .page-content {
+        padding: 28px 25px 40px;
+    }
+
+    .topbar {
+        padding: 0 25px;
+    }
+
+    /* Dashboard cards */
+    .dashboard-grid {
+        gap: 16px;
+    }
+
+    .dashboard-card {
+        padding: 20px;
+    }
+
+    /* Reduce checklist columns */
+    .checklist-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Notes */
+    .notes-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Checklist templates */
+    .template-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =========================================================
+   3. TABLETS
+   Screens up to 992px
+========================================================= */
+
+@media (max-width: 992px) {
+
+    /* Make the sidebar smaller */
+    :root {
+        --sidebar-width: 200px;
+    }
+
+    .sidebar {
+        padding: 25px 13px 18px;
+    }
+
+    /* Brand */
+    .brand {
+        gap: 9px;
+        padding: 0 5px;
+        margin-bottom: 28px;
+    }
+
+    .brand-icon {
+        width: 39px;
+        height: 39px;
+        font-size: 21px;
+    }
+
+    .brand-text h1 {
+        font-size: 19px;
+    }
+
+    /* Navigation */
+    .nav-item {
+        padding: 11px;
+        gap: 10px;
+        font-size: 12px;
+    }
+
+    /* Header */
+    .topbar {
+        height: 72px;
+    }
+
+    /* Welcome section */
+    .welcome-section h2 {
+        font-size: 30px;
+    }
+
+    .welcome-decoration {
+        width: 80px;
+        height: 80px;
+        font-size: 32px;
+    }
+
+    /* Dashboard */
+    .dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Statistics */
+    .stats-grid {
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 18px;
+        min-height: 125px;
+    }
+
+    .stat-card h3 {
+        font-size: 28px;
+    }
+
+    /* Checklists */
+    .checklist-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .template-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    /* Full calendar */
+    #fullCalendar .calendar-day {
+        min-height: 75px;
+        padding: 9px;
+    }
+
+    /* Progress */
+    .weekly-chart {
+        gap: 8px;
+    }
+
+}
+
+
+/* =========================================================
+   4. SMALL TABLETS / LARGE PHONES
+   Screens up to 768px
+========================================================= */
+
+@media (max-width: 768px) {
+
+    /* -----------------------------------------------------
+       APPLICATION LAYOUT
+    ----------------------------------------------------- */
+
+    /*
+       On mobile and smaller tablets, the sidebar is removed
+       from the layout.
+
+       The mobile menu can still open it if JavaScript adds
+       the .sidebar.open class.
+    */
+
+    .app-container {
+        display: block;
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+
+        width: 270px;
+        height: 100dvh;
+        min-height: 0;
+
+        transform: translateX(-100%);
+
+        transition: transform 0.3s ease;
+
+        box-shadow: none;
+
+        z-index: 1000;
+    }
+
+    /* Sidebar opened by mobile menu */
+    .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 15px 0 40px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Main content uses full screen */
+    .main-content {
+        width: 100%;
+        min-height: 100vh;
+    }
+
+
+    /* -----------------------------------------------------
+       TOPBAR
+    ----------------------------------------------------- */
+
+    .topbar {
+        height: 65px;
+        padding: 0 18px;
+        gap: 12px;
+    }
+
+    /* Show the mobile menu button */
+    .mobile-menu-button {
+        display: flex;
+        flex-shrink: 0;
+    }
+
+    /* Search takes remaining space */
+    .search-container {
+        width: auto;
+        flex: 1;
+        min-width: 0;
+        height: 40px;
+        padding: 0 11px;
+    }
+
+    .search-container input {
+        font-size: 11px;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    .profile-avatar {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+    }
+
+
+    /* -----------------------------------------------------
+       PAGE CONTENT
+    ----------------------------------------------------- */
+
+    .page-content {
+        padding: 25px 20px 110px;
+    }
+
+
+    /* -----------------------------------------------------
+       WELCOME SECTION
+    ----------------------------------------------------- */
+
+    .welcome-section {
+        margin-bottom: 23px;
+    }
+
+    .welcome-section h2 {
+        font-size: 28px;
+    }
+
+    .welcome-section p:not(.eyebrow) {
+        font-size: 12px;
+    }
+
+    .welcome-decoration {
+        width: 65px;
+        height: 65px;
+        font-size: 27px;
+    }
+
+
+    /* -----------------------------------------------------
+       STATISTICS
+    ----------------------------------------------------- */
+
+    .stats-grid {
+        gap: 12px;
+    }
+
+    .stat-card {
+        min-height: 115px;
+        padding: 16px;
+        border-radius: 17px;
+    }
+
+    .stat-card h3 {
+        font-size: 25px;
+    }
+
+    .stat-card-top {
+        font-size: 10px;
+    }
+
+    .stat-card p {
+        font-size: 10px;
+    }
+
+
+    /* -----------------------------------------------------
+       DASHBOARD
+    ----------------------------------------------------- */
+
+    .dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 15px;
+    }
+
+    .dashboard-card {
+        padding: 18px;
+        border-radius: 19px;
+    }
+
+    .card-header h3 {
+        font-size: 18px;
+    }
+
+
+    /* -----------------------------------------------------
+       TASKS
+    ----------------------------------------------------- */
+
+    .task-item {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .task-title {
+        font-size: 12px;
+    }
+
+    .task-description {
+        font-size: 10px;
+    }
+
+    /*
+       On touch screens, task actions should always be visible.
+       Hover does not work reliably on phones.
+    */
+
+    .task-actions {
+        opacity: 1;
+    }
+
+    .task-action-button {
+        width: 32px;
+        height: 32px;
+    }
+
+
+    /* -----------------------------------------------------
+       CHECKLISTS
+    ----------------------------------------------------- */
+
+    .checklist-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .template-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .template-card {
+        min-height: 95px;
+        padding: 12px 8px;
+    }
+
+    .template-icon {
+        font-size: 24px;
+    }
+
+    .checklist-card {
+        padding: 17px;
+    }
+
+
+    /* -----------------------------------------------------
+       NOTES
+    ----------------------------------------------------- */
+
+    .notes-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .note-card {
+        padding: 17px;
+        min-height: 160px;
+    }
+
+
+    /* -----------------------------------------------------
+       CALENDAR
+    ----------------------------------------------------- */
+
+    .calendar-header {
+        gap: 10px;
+    }
+
+    .calendar-header h3 {
+        font-size: 19px;
+        min-width: 120px;
+    }
+
+    #fullCalendar .calendar-day {
+        min-height: 65px;
+        padding: 8px;
+        font-size: 10px;
+    }
+
+    .calendar-day-name {
+        font-size: 8px;
+    }
+
+
+    /* -----------------------------------------------------
+       PROGRESS
+    ----------------------------------------------------- */
+
+    .weekly-chart {
+        height: 200px;
+    }
+
+    .chart-bar-container {
+        height: 145px;
+    }
+
+    #achievementsGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+
+    /* -----------------------------------------------------
+       MODALS
+    ----------------------------------------------------- */
+
+    .modal {
+        max-width: 500px;
+        padding: 24px;
+        border-radius: 21px;
+    }
+
+    .modal-overlay {
+        padding: 15px;
+    }
+
+
+    /* -----------------------------------------------------
+       TOASTS
+    ----------------------------------------------------- */
+
+    .toast-container {
+        top: 80px;
+        right: 15px;
+        left: 15px;
+    }
+
+    .toast {
+        max-width: none;
+        width: 100%;
+    }
+
+
+    /* -----------------------------------------------------
+       MOBILE BOTTOM NAVIGATION
+    ----------------------------------------------------- */
+
+    /*
+       A fixed navigation bar at the bottom of the screen.
+
+       JavaScript will control which navigation item is active.
+    */
+
+    .mobile-bottom-navigation {
+        display: flex;
+
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        height: calc(72px + env(safe-area-inset-bottom));
+
+        padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+
+        background: rgba(29, 25, 36, 0.96);
+
+        backdrop-filter: blur(18px);
+
+        border-top: 1px solid #393143;
+
+        justify-content: space-around;
+        align-items: center;
+
+        z-index: 900;
+    }
+
+    .mobile-nav-item {
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 5px;
+
+        flex: 1;
+
+        min-width: 0;
+
+        padding: 7px 4px;
+
+        background: transparent;
+
+        color: #91879c;
+
+        border-radius: 12px;
+
+        font-size: 9px;
+
+        transition: all 0.2s ease;
+    }
+
+    .mobile-nav-item svg,
+    .mobile-nav-item i {
+        width: 20px;
+        height: 20px;
+    }
+
+    .mobile-nav-item:hover {
+        color: #d8bce9;
+    }
+
+    .mobile-nav-item.active {
+        color: #d8bce9;
+    }
+
+    .mobile-nav-item.active svg {
+        stroke: #d8bce9;
+    }
+
+}
+
+
+/* =========================================================
+   5. MOBILE PHONES
+   Screens up to 576px
+========================================================= */
+
+@media (max-width: 576px) {
+
+    /* -----------------------------------------------------
+       GENERAL
+    ----------------------------------------------------- */
+
+    body {
+        font-size: 14px;
+    }
+
+    .page-content {
+        padding: 20px 15px 110px;
+    }
+
+
+    /* -----------------------------------------------------
+       HEADER
+    ----------------------------------------------------- */
+
+    .topbar {
+        padding: 0 13px;
+        height: 60px;
+    }
+
+    .search-container {
+        max-width: none;
+    }
+
+    .search-container input {
+        font-size: 10px;
+    }
+
+    .header-actions {
+        gap: 4px;
+    }
+
+    .header-actions .icon-button {
+        width: 34px;
+        height: 34px;
+    }
+
+    .profile-avatar {
+        width: 32px;
+        height: 32px;
+    }
+
+
+    /* -----------------------------------------------------
+       WELCOME SECTION
+    ----------------------------------------------------- */
+
+    .welcome-section {
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .welcome-section h2 {
+        font-size: 25px;
+        line-height: 1.4;
+    }
+
+    .welcome-section p:not(.eyebrow) {
+        font-size: 11px;
+        max-width: 270px;
+    }
+
+    .eyebrow {
+        font-size: 9px;
+    }
+
+    .welcome-decoration {
+        width: 54px;
+        height: 54px;
+        font-size: 23px;
+        flex-shrink: 0;
+    }
+
+
+    /* -----------------------------------------------------
+       STATISTICS
+    ----------------------------------------------------- */
+
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        min-height: 105px;
+        padding: 14px;
+        border-radius: 16px;
+    }
+
+    .stat-card h3 {
+        font-size: 23px;
+        margin-top: 6px;
+    }
+
+    .stat-card-top {
+        font-size: 10px;
+    }
+
+    .stat-card-top svg {
+        width: 15px;
+        height: 15px;
+    }
+
+    .stat-card p {
+        font-size: 9px;
+    }
+
+
+    /* -----------------------------------------------------
+       DASHBOARD GRID
+    ----------------------------------------------------- */
+
+    /*
+       On small phones, we use a single column.
+
+       This avoids squeezing the content into tiny cards.
+    */
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .dashboard-card {
+        padding: 19px;
+        border-radius: 19px;
+    }
+
+    .card-header {
+        margin-bottom: 16px;
+    }
+
+    .card-header h3 {
+        font-size: 19px;
+    }
+
+
+    /* -----------------------------------------------------
+       TASKS
+    ----------------------------------------------------- */
+
+    .task-item {
+        padding: 12px 10px;
+        border-radius: 13px;
+    }
+
+    .task-checkbox {
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+    }
+
+    .task-title {
+        font-size: 12px;
+    }
+
+    .task-description {
+        font-size: 10px;
+    }
+
+    .task-tag {
+        font-size: 8px;
+        padding: 4px 6px;
+    }
+
+
+    /* -----------------------------------------------------
+       CATEGORY GRID
+    ----------------------------------------------------- */
+
+    .category-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .category-card {
+        padding: 14px;
+        border-radius: 14px;
+    }
+
+    .category-icon {
+        font-size: 20px;
+    }
+
+    .category-name {
+        font-size: 11px;
+    }
+
+
+    /* -----------------------------------------------------
+       CHECKLISTS
+    ----------------------------------------------------- */
+
+    .checklist-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .template-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .template-card {
+        min-height: 95px;
+    }
+
+    .checklist-card-title {
+        font-size: 17px;
+    }
+
+
+    /* -----------------------------------------------------
+       NOTES
+    ----------------------------------------------------- */
+
+    .notes-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .note-card {
+        min-height: 140px;
+        padding: 18px;
+    }
+
+    .note-card h3 {
+        font-size: 18px;
+    }
+
+
+    /* -----------------------------------------------------
+       PAGE HEADINGS
+    ----------------------------------------------------- */
+
+    .page-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 22px;
+    }
+
+    .page-heading h2 {
+        font-size: 27px;
+    }
+
+    .page-heading .primary-button {
+        width: 100%;
+    }
+
+
+    /* -----------------------------------------------------
+       FILTERS
+    ----------------------------------------------------- */
+
+    .task-filter-bar {
+        gap: 7px;
+    }
+
+    .filter-button {
+        padding: 9px 12px;
+        font-size: 10px;
+    }
+
+    .task-toolbar {
+        flex-direction: column;
+    }
+
+    .task-toolbar select {
+        width: 100%;
+    }
+
+
+    /* -----------------------------------------------------
+       FULL CALENDAR
+    ----------------------------------------------------- */
+
+    #fullCalendar .calendar-day {
+        min-height: 47px;
+        padding: 5px;
+        border-radius: 9px;
+        font-size: 10px;
+    }
+
+    .calendar-grid {
+        gap: 3px;
+    }
+
+    .calendar-day-name {
+        font-size: 8px;
+        padding: 5px 0;
+    }
+
+    .calendar-header h3 {
+        font-size: 17px;
+        min-width: 105px;
+    }
+
+    .calendar-header .icon-button {
+        width: 33px;
+        height: 33px;
+    }
+
+
+    /* -----------------------------------------------------
+       PROGRESS
+    ----------------------------------------------------- */
+
+    .weekly-chart {
+        height: 175px;
+        gap: 5px;
+        padding: 15px 2px 8px;
+    }
+
+    .chart-bar-container {
+        height: 120px;
+        max-width: 30px;
+    }
+
+    .chart-day-label {
+        font-size: 9px;
+    }
+
+    .chart-day-count {
+        font-size: 9px;
+    }
+
+    #achievementsGrid {
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+    }
+
+    .achievement-card {
+        padding: 15px 10px;
+    }
+
+
+    /* -----------------------------------------------------
+       MODALS
+    ----------------------------------------------------- */
+
+    .modal-overlay {
+        padding: 10px;
+        align-items: center;
+    }
+
+    .modal {
+        max-height: 92dvh;
+        padding: 21px 17px;
+        border-radius: 20px;
+    }
+
+    .modal-header h2 {
+        font-size: 21px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 16px;
+        /*
+           16px prevents automatic input zoom on iPhones.
+        */
+    }
+
+    .modal-footer {
+        flex-direction: column-reverse;
+    }
+
+    .modal-footer button {
+        width: 100%;
+    }
+
+
+    /* -----------------------------------------------------
+       NOTIFICATIONS
+    ----------------------------------------------------- */
+
+    .notification-permission-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .notification-permission-card button {
+        width: 100%;
+    }
+
+    .reminder-card {
+        padding: 14px;
+        gap: 11px;
+    }
+
+    .reminder-time {
+        font-size: 10px;
+    }
+
+
+    /* -----------------------------------------------------
+       BUTTONS
+    ----------------------------------------------------- */
+
+    .primary-button,
+    .secondary-button {
+        padding: 12px 14px;
+        min-height: 42px;
+    }
+
+
+    /* -----------------------------------------------------
+       TOASTS
+    ----------------------------------------------------- */
+
+    .toast-container {
+        top: 70px;
+        left: 10px;
+        right: 10px;
+    }
+
+    .toast {
+        min-width: 0;
+        padding: 12px 14px;
+        font-size: 11px;
+    }
+
+}
+
+
+/* =========================================================
+   6. EXTRA SMALL PHONES
+   Screens up to 380px
+========================================================= */
+
+@media (max-width: 380px) {
+
+    .page-content {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .welcome-section h2 {
+        font-size: 22px;
+    }
+
+    .welcome-decoration {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+
+    .stat-card {
+        padding: 12px;
+    }
+
+    .stat-card h3 {
+        font-size: 21px;
+    }
+
+    .dashboard-card {
+        padding: 15px;
+    }
+
+    .template-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .mobile-nav-item {
+        font-size: 8px;
+    }
+
+    .mobile-nav-item svg {
+        width: 18px;
+        height: 18px;
+    }
+
+}
+
+
+/* =========================================================
+   7. LANDSCAPE MOBILE
+========================================================= */
+
+@media (max-width: 768px) and (orientation: landscape) {
+
+    /*
+       In landscape, the phone has less vertical space.
+       Reduce unnecessary vertical spacing.
+    */
+
+    .welcome-section {
+        margin-bottom: 15px;
+    }
+
+    .page-content {
+        padding-top: 18px;
+    }
+
+    .mobile-bottom-navigation {
+        height: calc(60px + env(safe-area-inset-bottom));
+    }
+
+    .modal {
+        max-height: 85dvh;
+    }
+
+}
+
+
+/* =========================================================
+   8. REDUCED MOTION ACCESSIBILITY
+========================================================= */
+
+/*
+   Some users prefer less animation.
+
+   This setting respects their operating-system preference.
+*/
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+
+        animation-duration: 0.01ms !important;
+
+        animation-iteration-count: 1 !important;
+
+        transition-duration: 0.01ms !important;
+
+        scroll-behavior: auto !important;
+
+    }
+
+}
+
+
+/* =========================================================
+   END OF RESPONSIVE STYLESHEET
+========================================================= */
