@@ -1,23 +1,18 @@
-
 /* ==========================================================
    VELVET DAY - MAIN APPLICATION
    File: js/app.js
 
-   This file is responsible for starting the application
-   and connecting its different components.
-
    Responsibilities:
-   - Initialize Velvet Day
-   - Load stored data
+   - Initialize the main application
+   - Load and save application data
    - Manage application state
-   - Initialize theme
-   - Initialize navigation
-   - Set up global event listeners
-   - Provide a central app object for other scripts
+   - Apply the selected theme
+   - Handle page navigation
+   - Handle the mobile sidebar
+   - Provide a central VelvetDay API
 
    Dependencies:
    - js/storage.js
-
    ========================================================== */
 
 (function () {
@@ -25,11 +20,6 @@
 
     // ----------------------------------------------------------
     // 1. APPLICATION STATE
-    // ----------------------------------------------------------
-    // This object contains the data currently being used by the app.
-    //
-    // LocalStorage stores the permanent copy.
-    // VelvetDay.state stores the copy currently used by JavaScript.
     // ----------------------------------------------------------
 
     const state = {
@@ -51,9 +41,6 @@
     // ----------------------------------------------------------
     // 3. DOM HELPER FUNCTIONS
     // ----------------------------------------------------------
-    // These functions help us find HTML elements without
-    // repeatedly writing document.querySelector().
-    // ----------------------------------------------------------
 
     function getElement(selector) {
         return document.querySelector(selector);
@@ -66,8 +53,6 @@
     // ----------------------------------------------------------
     // 4. LOAD APPLICATION DATA
     // ----------------------------------------------------------
-    // Loads the saved data using storage.js.
-    // ----------------------------------------------------------
 
     function loadAppData() {
         if (!window.VelvetStorage) {
@@ -78,44 +63,70 @@
             return {};
         }
 
-        return VelvetStorage.loadData();
+        try {
+            // storage.js exposes getAll(), not loadData().
+            return VelvetStorage.getAll();
+        } catch (error) {
+            console.error(
+                "Velvet Day: Failed to load application data.",
+                error
+            );
+
+            return {};
+        }
     }
 
     // ----------------------------------------------------------
     // 5. SAVE APPLICATION DATA
     // ----------------------------------------------------------
-    // Updates the app's state and saves the changes locally.
-    //
-    // Example:
-    // VelvetDay.save({
-    //     tasks: updatedTasks
-    // });
-    // ----------------------------------------------------------
 
     function save(updates) {
         if (!updates || typeof updates !== "object") {
+            console.error(
+                "Velvet Day: Invalid data supplied to save()."
+            );
+
             return false;
         }
 
-        // Update the in-memory data
-        state.data = {
+        if (!window.VelvetStorage) {
+            console.error(
+                "Velvet Day: Storage module is unavailable."
+            );
+
+            return false;
+        }
+
+        // Merge updates with the current application data.
+        const updatedData = {
             ...state.data,
             ...updates
         };
 
-        // Merge settings separately to prevent overwriting
-        // other settings accidentally.
+        // Merge settings separately so existing settings
+        // are not accidentally removed.
         if (updates.settings) {
-            state.data.settings = {
+            updatedData.settings = {
                 ...(state.data.settings || {}),
                 ...updates.settings
             };
         }
 
-        // Save the complete data object
-        const saved = VelvetStorage.saveData(state.data);
+        // Save the complete data object.
+        const saved = VelvetStorage.saveData(updatedData);
 
-        // Notify other components that the data has changed
+        if (!saved) {
+            console.error(
+                "Velvet Day: Unable to save application data."
+            );
+
+            return false;
+        }
+
+        // Update application state only after a successful save.
+        state.data = updatedData;
+
+        // Notify other components.
         document.dispatchEvent(
             new CustomEvent("velvet:data-updated", {
                 detail: {
@@ -125,36 +136,63 @@
             })
         );
 
-        return saved;
+        return true;
     }
 
     // ----------------------------------------------------------
     // 6. GET DATA
     // ----------------------------------------------------------
-    // Gets a value from the current application state.
-    //
-    // Example:
-    // VelvetDay.get("tasks");
-    // VelvetDay.get("settings");
-    // ----------------------------------------------------------
 
-    function get(key) {
-        return state.data[key];
+    function get(key, fallback = null) {
+        if (!key || typeof key !== "string") {
+            return fallback;
+        }
+
+        const keys = key.split(".");
+        let value = state.data;
+
+        for (const part of keys) {
+            if (
+                value === null ||
+                value === undefined ||
+                !Object.prototype.hasOwnProperty.call(value, part)
+            ) {
+                return fallback;
+            }
+
+            value = value[part];
+        }
+
+        return value === undefined ? fallback : value;
     }
 
     // ----------------------------------------------------------
     // 7. UPDATE A SINGLE PROPERTY
     // ----------------------------------------------------------
-    // Updates a specific section of the app data.
-    //
-    // Example:
-    // VelvetDay.set("notes", notes);
-    // ----------------------------------------------------------
 
     function set(key, value) {
-        const updates = {
-            [key]: value
-        };
+        if (!key || typeof key !== "string") {
+            return false;
+        }
+
+        const keys = key.split(".");
+        const updates = {};
+        let current = updates;
+
+        // Build nested update objects when necessary.
+        for (let index = 0; index < keys.length - 1; index++) {
+            current[keys[index]] = {};
+            current = current[keys[index]];
+        }
+
+        current[keys[keys.length - 1]] = value;
+
+        // Handle nested settings separately.
+        if (keys[0] === "settings") {
+            return save({
+                settings: updates.settings
+            });
+        }
 
         return save(updates);
     }
@@ -162,136 +200,200 @@
     // ----------------------------------------------------------
     // 8. THEME MANAGEMENT
     // ----------------------------------------------------------
-    // Applies the selected theme to the HTML document.
-    //
-    // Supported themes:
-    // - dark
-    // - light
-    //
-    // The theme is stored in LocalStorage through settings.
-    // ----------------------------------------------------------
 
-  function applyTheme(theme) {
-    if (window.VelvetTheme) {
-        return VelvetTheme.applyTheme(theme);
+    function applyTheme(theme) {
+        const selectedTheme =
+            theme === "light" ? "light" : "dark";
+
+        // Use the dedicated theme module when available.
+        if (
+            window.VelvetTheme &&
+            typeof window.VelvetTheme.applyTheme === "function"
+        ) {
+            return window.VelvetTheme.applyTheme(selectedTheme);
+        }
+
+        document.documentElement.setAttribute(
+            "data-theme",
+            selectedTheme
+        );
+
+        updateThemeButtons(selectedTheme);
+
+        return selectedTheme;
     }
 
-    document.documentElement.setAttribute("data-theme", theme);
-
-    return theme;
-}
     // ----------------------------------------------------------
     // 9. UPDATE THEME BUTTONS
-    // ----------------------------------------------------------
-    // Changes the icon or label on theme toggle buttons.
     // ----------------------------------------------------------
 
     function updateThemeButtons(theme) {
         const themeButtons = getAllElements("[data-theme-toggle]");
 
         themeButtons.forEach(function (button) {
-            button.setAttribute("aria-label", "Switch theme");
+            const isDark = theme === "dark";
 
-            // Update the icon based on the current theme
+            button.setAttribute(
+                "aria-label",
+                isDark ? "Switch to light theme" : "Switch to dark theme"
+            );
+
+            button.setAttribute(
+                "title",
+                isDark ? "Switch to light mode" : "Switch to dark mode"
+            );
+
+            // Update an icon if the button contains one.
             const icon = button.querySelector("i, svg");
 
             if (icon) {
                 icon.setAttribute(
                     "data-lucide",
-                    theme === "dark" ? "sun" : "moon"
+                    isDark ? "sun" : "moon"
                 );
+            } else {
+                button.textContent = isDark ? "☀" : "☾";
             }
-
-            button.setAttribute(
-                "title",
-                theme === "dark"
-                    ? "Switch to light mode"
-                    : "Switch to dark mode"
-            );
         });
     }
 
     // ----------------------------------------------------------
     // 10. TOGGLE THEME
     // ----------------------------------------------------------
-    // Switches between light and dark mode.
-    // ----------------------------------------------------------
 
- function toggleTheme() {
-    if (window.VelvetTheme) {
-        return VelvetTheme.toggleTheme();
+    function toggleTheme() {
+        if (
+            window.VelvetTheme &&
+            typeof window.VelvetTheme.toggleTheme === "function"
+        ) {
+            return window.VelvetTheme.toggleTheme();
+        }
+
+        const currentTheme =
+            document.documentElement.getAttribute("data-theme") ||
+            config.defaultTheme;
+
+        const newTheme =
+            currentTheme === "dark" ? "light" : "dark";
+
+        applyTheme(newTheme);
+
+        save({
+            settings: {
+                theme: newTheme
+            }
+        });
+
+        return newTheme;
     }
 
-    const currentTheme =
-        document.documentElement.getAttribute("data-theme") || "dark";
+    // ----------------------------------------------------------
+    // 11. PAGE TITLE CONFIGURATION
+    // ----------------------------------------------------------
 
-    const newTheme = currentTheme === "dark" ? "light" : "dark";
-
-    applyTheme(newTheme);
-
-    return newTheme;
-}
+    const pageTitles = {
+        dashboard: "Dashboard",
+        tasks: "My Tasks",
+        calendar: "Calendar",
+        notes: "My Notes",
+        "brain-dump": "Brain Dump",
+        checklists: "My Checklists",
+        recurring: "Recurring Tasks",
+        reminders: "Reminders",
+        progress: "My Progress",
+        settings: "Settings"
+    };
 
     // ----------------------------------------------------------
-    // 11. NAVIGATION
+    // 12. UPDATE PAGE TITLE
     // ----------------------------------------------------------
-    // Handles switching between different pages or sections.
-    //
-    // Navigation buttons should have:
-    // data-page="dashboard"
-    // data-page="tasks"
-    // data-page="notes"
-    //
-    // Content sections should have:
-    // data-page-content="dashboard"
-    // data-page-content="tasks"
-    // data-page-content="notes"
+
+    function updatePageTitle(pageName) {
+        const title =
+            pageTitles[pageName] || pageName;
+
+        // Matches the index.html heading.
+        const pageHeading = getElement("#pageTitle");
+
+        if (pageHeading) {
+            pageHeading.textContent = title;
+        }
+
+        // Also supports an optional data attribute.
+        const alternateHeading = getElement("[data-page-title]");
+
+        if (alternateHeading) {
+            alternateHeading.textContent = title;
+        }
+
+        document.title = `${title} | ${config.appName}`;
+    }
+
+    // ----------------------------------------------------------
+    // 13. PAGE NAVIGATION
+    // ----------------------------------------------------------
+    // index.html uses:
+    // Navigation: data-page-target="tasks"
+    // Content:    data-page="tasks"
     // ----------------------------------------------------------
 
     function navigate(pageName) {
-        if (!pageName) {
-            return;
+        if (!pageName || typeof pageName !== "string") {
+            return false;
+        }
+
+        // Find the requested page.
+        const pageSections = getAllElements(".page-section");
+
+        let targetPage = null;
+
+        pageSections.forEach(function (section) {
+            if (section.dataset.page === pageName) {
+                targetPage = section;
+            }
+        });
+
+        // Do not navigate to a page that does not exist.
+        if (!targetPage) {
+            console.warn(
+                `Velvet Day: Page "${pageName}" was not found.`
+            );
+
+            return false;
         }
 
         state.currentPage = pageName;
 
-        // Update navigation buttons
-        const navItems = getAllElements("[data-page]");
+        // Update navigation links.
+        const navItems = getAllElements("[data-page-target]");
 
         navItems.forEach(function (item) {
-            const itemPage = item.dataset.page;
+            const isActive =
+                item.dataset.pageTarget === pageName;
 
-            if (itemPage === pageName) {
-                item.classList.add("active");
+            item.classList.toggle("active", isActive);
 
+            if (isActive) {
                 item.setAttribute("aria-current", "page");
             } else {
-                item.classList.remove("active");
-
                 item.removeAttribute("aria-current");
             }
         });
 
-        // Show and hide page sections
-        const pageContents = getAllElements("[data-page-content]");
-
-        pageContents.forEach(function (section) {
-            const sectionPage = section.dataset.pageContent;
-
-            const isActive = sectionPage === pageName;
+        // Show the selected page and hide all others.
+        pageSections.forEach(function (section) {
+            const isActive =
+                section.dataset.page === pageName;
 
             section.classList.toggle("active", isActive);
-
             section.hidden = !isActive;
         });
 
-        // Update page title if an element exists
         updatePageTitle(pageName);
 
-        // Close mobile sidebar after navigation
         closeMobileSidebar();
 
-        // Notify other scripts that navigation has changed
+        // Notify other modules.
         document.dispatchEvent(
             new CustomEvent("velvet:page-changed", {
                 detail: {
@@ -299,48 +401,47 @@
                 }
             })
         );
+
+        return true;
     }
 
     // ----------------------------------------------------------
-    // 12. UPDATE PAGE TITLE
-    // ----------------------------------------------------------
-    // Updates the page title and optionally the browser tab title.
+    // 14. THEME INITIALIZATION
     // ----------------------------------------------------------
 
-    function updatePageTitle(pageName) {
-        const pageTitles = {
-            dashboard: "Dashboard",
-            tasks: "My Tasks",
-            brain: "Brain Dump",
-            notes: "My Notes",
-            checklist: "Checklists",
-            calendar: "Calendar",
-            recurring: "Recurring Tasks",
-            reminders: "Reminders",
-            progress: "My Progress",
-            settings: "Settings"
-        };
+    function initializeTheme() {
+        const settings = state.data.settings || {};
 
-        const title = pageTitles[pageName] || pageName;
+        const theme =
+            settings.theme || config.defaultTheme;
 
-        const pageHeading = getElement("[data-page-title]");
-
-        if (pageHeading) {
-            pageHeading.textContent = title;
-        }
-
-        document.title = `${title} | ${config.appName}`;
+        applyTheme(theme);
     }
 
     // ----------------------------------------------------------
-    // 13. MOBILE SIDEBAR
+    // 15. NAVIGATION INITIALIZATION
     // ----------------------------------------------------------
-    // Opens and closes the mobile sidebar.
-    //
-    // Expected optional HTML elements:
-    // #sidebar
-    // #sidebarOverlay
-    // [data-sidebar-toggle]
+
+    function initializeNavigation() {
+        const hashPage = window.location.hash
+            .replace(/^#/, "")
+            .trim();
+
+        const availablePages = Array.from(
+            getAllElements(".page-section")
+        ).map(function (section) {
+            return section.dataset.page;
+        });
+
+        const initialPage = availablePages.includes(hashPage)
+            ? hashPage
+            : config.defaultPage;
+
+        navigate(initialPage);
+    }
+
+    // ----------------------------------------------------------
+    // 16. MOBILE SIDEBAR
     // ----------------------------------------------------------
 
     function toggleMobileSidebar() {
@@ -357,7 +458,10 @@
             overlay.classList.toggle("active", isOpen);
         }
 
-        document.body.classList.toggle("sidebar-open", isOpen);
+        document.body.classList.toggle(
+            "sidebar-open",
+            isOpen
+        );
     }
 
     function closeMobileSidebar() {
@@ -376,57 +480,104 @@
     }
 
     // ----------------------------------------------------------
-    // 14. EVENT LISTENERS
-    // ----------------------------------------------------------
-    // Registers app-wide events.
-    //
-    // Event delegation allows buttons to work even when their
-    // elements are created dynamically later.
+    // 17. GLOBAL EVENT LISTENERS
     // ----------------------------------------------------------
 
-    // Navigation clicks
-document.addEventListener("click", function (event) {
-    const navButton = event.target.closest("[data-page]");
+    function setupEventListeners() {
 
-    if (navButton) {
-        event.preventDefault();
+        // ------------------------------------------------------
+        // Navigation clicks
+        // ------------------------------------------------------
 
-        navigate(navButton.dataset.page);
+        document.addEventListener("click", function (event) {
+            const navButton = event.target.closest(
+                "[data-page-target]"
+            );
 
-        return;
+            if (!navButton) {
+                return;
+            }
+
+            event.preventDefault();
+
+            const pageName = navButton.dataset.pageTarget;
+
+            if (navigate(pageName)) {
+                // Update the URL without reloading the application.
+                window.history.replaceState(
+                    null,
+                    "",
+                    `#${pageName}`
+                );
+            }
+        });
+
+        // ------------------------------------------------------
+        // Browser back/forward and hash navigation
+        // ------------------------------------------------------
+
+        window.addEventListener("hashchange", function () {
+            const pageName = window.location.hash
+                .replace(/^#/, "")
+                .trim();
+
+            if (pageName) {
+                navigate(pageName);
+            }
+        });
+
+        // ------------------------------------------------------
+        // Mobile menu button
+        // ------------------------------------------------------
+
+        const menuToggle = getElement("#menuToggle");
+
+        if (menuToggle) {
+            menuToggle.addEventListener(
+                "click",
+                toggleMobileSidebar
+            );
+        }
+
+        // ------------------------------------------------------
+        // Mobile sidebar close button
+        // ------------------------------------------------------
+
+        const sidebarClose = getElement("#sidebarClose");
+
+        if (sidebarClose) {
+            sidebarClose.addEventListener(
+                "click",
+                closeMobileSidebar
+            );
+        }
+
+        // ------------------------------------------------------
+        // Mobile sidebar overlay
+        // ------------------------------------------------------
+
+        const sidebarOverlay = getElement("#sidebarOverlay");
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener(
+                "click",
+                closeMobileSidebar
+            );
+        }
+
+        // ------------------------------------------------------
+        // Escape key closes the mobile sidebar
+        // ------------------------------------------------------
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                closeMobileSidebar();
+            }
+        });
     }
-    // ----------------------------------------------------------
-    // 15. INITIALIZE THE THEME
-    // ----------------------------------------------------------
-    // Reads the user's saved theme and applies it.
-    // ----------------------------------------------------------
-
-    function initializeTheme() {
-        const settings = state.data.settings || {};
-
-        const theme = settings.theme || config.defaultTheme;
-
-        applyTheme(theme);
-    }
 
     // ----------------------------------------------------------
-    // 16. INITIALIZE NAVIGATION
-    // ----------------------------------------------------------
-    // Starts the application on the default page.
-    // ----------------------------------------------------------
-
-    function initializeNavigation() {
-        const initialPage = config.defaultPage;
-
-        navigate(initialPage);
-    }
-
-    // ----------------------------------------------------------
-    // 17. INITIALIZE APPLICATION
-    // ----------------------------------------------------------
-    // This is the main startup function.
-    //
-    // It should run only once.
+    // 18. INITIALIZE APPLICATION
     // ----------------------------------------------------------
 
     function initialize() {
@@ -436,28 +587,33 @@ document.addEventListener("click", function (event) {
 
         console.log("💜 Starting Velvet Day...");
 
-        // Load data from LocalStorage
+        // Load saved data.
         state.data = loadAppData();
 
-        // Initialize theme
+        // Ensure settings are available.
+        if (!state.data.settings) {
+            state.data.settings = {
+                theme: config.defaultTheme
+            };
+        }
+
+        // Initialize theme.
         initializeTheme();
 
-        // Initialize navigation
+        // Initialize navigation.
         initializeNavigation();
 
-        // Register app-wide event listeners
+        // Register global events.
         setupEventListeners();
 
-        // Mark the app as initialized
+        // Mark the application as initialized.
         state.isInitialized = true;
 
         console.log("✨ Velvet Day is ready!");
     }
 
     // ----------------------------------------------------------
-    // 18. PUBLIC APPLICATION API
-    // ----------------------------------------------------------
-    // Other JavaScript files can access VelvetDay.
+    // 19. PUBLIC APPLICATION API
     // ----------------------------------------------------------
 
     window.VelvetDay = {
@@ -471,6 +627,7 @@ document.addEventListener("click", function (event) {
         save: save,
 
         navigate: navigate,
+        updatePageTitle: updatePageTitle,
 
         applyTheme: applyTheme,
         toggleTheme: toggleTheme,
@@ -480,16 +637,14 @@ document.addEventListener("click", function (event) {
     };
 
     // ----------------------------------------------------------
-    // 19. START APP WHEN DOM IS READY
-    // ----------------------------------------------------------
-    // If HTML is still loading, wait for DOMContentLoaded.
-    // Otherwise initialize immediately.
+    // 20. START APPLICATION WHEN DOM IS READY
     // ----------------------------------------------------------
 
     if (document.readyState === "loading") {
         document.addEventListener(
             "DOMContentLoaded",
-            initialize
+            initialize,
+            { once: true }
         );
     } else {
         initialize();
