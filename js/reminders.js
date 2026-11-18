@@ -634,69 +634,80 @@ const VelvetReminders = {
     // Check tasks for reminders
     // --------------------------------------------------------
 
-    checkReminders: function () {
+   
+// Corrected reminder check
+checkReminders: function () {
 
-        if (!this.settings.enabled) {
+    if (!this.settings.enabled) {
+        return;
+    }
+
+    if (
+        !window.VelvetTasks ||
+        typeof VelvetTasks.getTasks !== "function"
+    ) {
+        return;
+    }
+
+    const tasks = VelvetTasks.getTasks();
+    const now = new Date();
+
+    tasks.forEach(task => {
+
+        if (task.completed || !task.dueDate) {
             return;
         }
 
+        const dueValue = String(task.dueDate);
 
-        if (
-            !window.VelvetTasks ||
-            typeof VelvetTasks.getTasks !== "function"
-        ) {
-            return;
-        }
+        let reminderDate;
 
+        // Date-only tasks use the configured reminder time.
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dueValue)) {
 
-        const tasks = VelvetTasks.getTasks();
+            const [year, month, day] =
+                dueValue.split("-").map(Number);
 
-        const now = new Date();
+            const [hours, minutes] =
+                this.settings.reminderTime.split(":").map(Number);
 
-
-        tasks.forEach(task => {
-
-            // Skip completed tasks
-            if (task.completed) {
-                return;
-            }
-
-
-            // Skip tasks without a due date
-            if (!task.dueDate) {
-                return;
-            }
-
-
-            const dueDate = this.parseDate(
-                task.dueDate
+            reminderDate = new Date(
+                year,
+                month - 1,
+                day,
+                hours,
+                minutes,
+                0,
+                0
             );
 
+        } else {
 
-            if (!dueDate) {
+            // Date/time tasks are reminded before their due time.
+            const dueDate = new Date(dueValue);
+
+            if (Number.isNaN(dueDate.getTime())) {
                 return;
             }
 
-
-            // Reminder time
-            const reminderDate = new Date(
+            reminderDate = new Date(
                 dueDate.getTime() -
-                Number(this.settings.advanceMinutes) *
-                60 *
-                1000
+                Number(this.settings.advanceMinutes) * 60 * 1000
             );
+        }
 
+        // Notify during the first check window after the reminder time.
+        const windowEnd = new Date(
+            reminderDate.getTime() +
+            VelvetRemindersConfig.checkInterval
+        );
 
-            // Notify if reminder time has arrived
-            if (
-                now >= reminderDate &&
-                now <= dueDate
-            ) {
+        if (now >= reminderDate && now <= windowEnd) {
+            this.notifyTask(task);
+        }
+    });
+},
 
-                this.notifyTask(task);
-            }
-        });
-    },
 
 
     // --------------------------------------------------------
