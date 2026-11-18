@@ -3,72 +3,220 @@
    File: js/app.js
 
    Responsibilities:
-   - Initialize the main application
-   - Load and save application data
-   - Manage application state
-   - Apply the selected theme
-   - Handle page navigation
+   - Keep application data synchronized with storage
+   - Prevent stale data from overwriting newer data
+   - Provide the shared VelvetDay API
+   - Handle page display and navigation events
+   - Handle theme switching
    - Handle the mobile sidebar
-   - Provide a central VelvetDay API
-
-   Dependencies:
-   - js/storage.js
    ========================================================== */
 
 (function () {
     "use strict";
 
-    // ----------------------------------------------------------
-    // 1. APPLICATION STATE
-    // ----------------------------------------------------------
-
-    const state = {
-        data: {},
-        currentPage: "dashboard",
-        isInitialized: false
-    };
-
-    // ----------------------------------------------------------
-    // 2. APPLICATION CONFIGURATION
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 1. CONFIGURATION
+    // ------------------------------------------------------
 
     const config = {
         appName: "Velvet Day",
         defaultPage: "dashboard",
-        defaultTheme: "dark"
+        defaultTheme: "dark",
+        storageKey: "velvet-day:data:v1"
     };
 
-    // ----------------------------------------------------------
-    // 3. DOM HELPER FUNCTIONS
-    // ----------------------------------------------------------
+    const pageInformation = {
+        dashboard: {
+            title: "Dashboard",
+            subtitle: "Make today a little more intentional."
+        },
+        tasks: {
+            title: "My Tasks",
+            subtitle: "One step at a time."
+        },
+        calendar: {
+            title: "Calendar",
+            subtitle: "Make space for what matters."
+        },
+        notes: {
+            title: "My Notes",
+            subtitle: "Thoughts worth keeping."
+        },
+        "brain-dump": {
+            title: "Brain Dump",
+            subtitle: "Let your thoughts out."
+        },
+        checklists: {
+            title: "My Checklists",
+            subtitle: "Little things, all organized."
+        },
+        recurring: {
+            title: "Recurring Tasks",
+            subtitle: "Build little habits."
+        },
+        reminders: {
+            title: "Reminders",
+            subtitle: "Things you don't want to forget."
+        },
+        progress: {
+            title: "My Progress",
+            subtitle: "Look how far you've come."
+        },
+        settings: {
+            title: "Settings",
+            subtitle: "Make Velvet Day yours."
+        }
+    };
 
-    function getElement(selector) {
-        return document.querySelector(selector);
+    // ------------------------------------------------------
+    // 2. APPLICATION STATE
+    // ------------------------------------------------------
+
+    const state = {
+        data: {},
+        currentPage: config.defaultPage,
+        previousPage: null,
+        isInitialized: false
+    };
+
+    // ------------------------------------------------------
+    // 3. GENERAL HELPERS
+    // ------------------------------------------------------
+
+    function getElement(selector, parent = document) {
+        return parent.querySelector(selector);
     }
 
-    function getAllElements(selector) {
-        return document.querySelectorAll(selector);
+    function getAllElements(selector, parent = document) {
+        return Array.from(parent.querySelectorAll(selector));
     }
 
-    // ----------------------------------------------------------
-    // 4. LOAD APPLICATION DATA
-    // ----------------------------------------------------------
+    function isPlainObject(value) {
+        if (value === null || typeof value !== "object") {
+            return false;
+        }
+
+        const prototype = Object.getPrototypeOf(value);
+
+        return (
+            prototype === Object.prototype ||
+            prototype === null
+        );
+    }
+
+    function cloneValue(value) {
+        if (value === undefined) {
+            return undefined;
+        }
+
+        if (value === null || typeof value !== "object") {
+            return value;
+        }
+
+        try {
+            if (typeof structuredClone === "function") {
+                return structuredClone(value);
+            }
+
+            return JSON.parse(JSON.stringify(value));
+        } catch (error) {
+            console.warn(
+                "Velvet Day: Could not clone a data value.",
+                error
+            );
+
+            return value;
+        }
+    }
+
+    // Recursively merge objects.
+    // Arrays are replaced instead of merging their indexes.
+    function mergeObjects(base, updates) {
+        if (!isPlainObject(updates)) {
+            return cloneValue(updates);
+        }
+
+        const result = isPlainObject(base)
+            ? { ...base }
+            : {};
+
+        Object.keys(updates).forEach(function (key) {
+            const updateValue = updates[key];
+            const currentValue = result[key];
+
+            if (
+                isPlainObject(updateValue) &&
+                isPlainObject(currentValue)
+            ) {
+                result[key] = mergeObjects(
+                    currentValue,
+                    updateValue
+                );
+            } else {
+                result[key] = cloneValue(updateValue);
+            }
+        });
+
+        return result;
+    }
+
+    function getPathValue(source, path) {
+        return path.split(".").reduce(function (value, part) {
+            if (
+                value === null ||
+                value === undefined ||
+                !Object.prototype.hasOwnProperty.call(value, part)
+            ) {
+                return undefined;
+            }
+
+            return value[part];
+        }, source);
+    }
+
+    function isSafePath(path) {
+        if (typeof path !== "string" || !path.trim()) {
+            return false;
+        }
+
+        const parts = path.split(".");
+        const forbiddenParts = [
+            "__proto__",
+            "prototype",
+            "constructor"
+        ];
+
+        return parts.every(function (part) {
+            return (
+                part.length > 0 &&
+                !forbiddenParts.includes(part)
+            );
+        });
+    }
+
+    // ------------------------------------------------------
+    // 4. LOAD AND SYNCHRONIZE APPLICATION DATA
+    // ------------------------------------------------------
 
     function loadAppData() {
-        if (!window.VelvetStorage) {
+        if (
+            !window.VelvetStorage ||
+            typeof VelvetStorage.getAll !== "function"
+        ) {
             console.error(
-                "Velvet Day: storage.js has not been loaded."
+                "Velvet Day: storage.js is missing or has not loaded."
             );
 
             return {};
         }
 
         try {
-            // storage.js exposes getAll(), not loadData().
-            return VelvetStorage.getAll();
+            const data = VelvetStorage.getAll();
+
+            return isPlainObject(data) ? data : {};
         } catch (error) {
             console.error(
-                "Velvet Day: Failed to load application data.",
+                "Velvet Day: Failed to load saved data.",
                 error
             );
 
@@ -76,141 +224,316 @@
         }
     }
 
-    // ----------------------------------------------------------
-    // 5. SAVE APPLICATION DATA
-    // ----------------------------------------------------------
-
-    function save(updates) {
-        if (!updates || typeof updates !== "object") {
-            console.error(
-                "Velvet Day: Invalid data supplied to save()."
-            );
-
-            return false;
+    function synchronizeState(data) {
+        if (isPlainObject(data)) {
+            state.data = cloneValue(data);
+        } else {
+            state.data = loadAppData();
         }
 
-        if (!window.VelvetStorage) {
-            console.error(
-                "Velvet Day: Storage module is unavailable."
-            );
-
-            return false;
-        }
-
-        // Merge updates with the current application data.
-        const updatedData = {
-            ...state.data,
-            ...updates
-        };
-
-        // Merge settings separately so existing settings
-        // are not accidentally removed.
-        if (updates.settings) {
-            updatedData.settings = {
-                ...(state.data.settings || {}),
-                ...updates.settings
+        if (!isPlainObject(state.data.settings)) {
+            state.data.settings = {
+                theme: config.defaultTheme
             };
         }
 
-        // Save the complete data object.
-        const saved = VelvetStorage.saveData(updatedData);
+        return state.data;
+    }
 
-        if (!saved) {
-            console.error(
-                "Velvet Day: Unable to save application data."
-            );
+    // Synchronize data whenever storage.js saves something.
+    function handleStorageUpdated(event) {
+        const detail =
+            event && isPlainObject(event.detail)
+                ? event.detail
+                : {};
 
-            return false;
-        }
+        synchronizeState(detail.data);
 
-        // Update application state only after a successful save.
-        state.data = updatedData;
-
-        // Notify other components.
         document.dispatchEvent(
             new CustomEvent("velvet:data-updated", {
                 detail: {
-                    updates: updates,
-                    data: state.data
+                    type: detail.type || "save",
+                    data: cloneValue(state.data)
                 }
             })
         );
 
-        return true;
+        // Reload feature modules after importing or clearing data.
+        if (
+            detail.type === "import" ||
+            detail.type === "clear"
+        ) {
+            document.dispatchEvent(
+                new CustomEvent("velvet:data-reloaded", {
+                    detail: {
+                        type: detail.type,
+                        data: cloneValue(state.data)
+                    }
+                })
+            );
+        }
     }
 
-    // ----------------------------------------------------------
-    // 6. GET DATA
-    // ----------------------------------------------------------
-
-    function get(key, fallback = null) {
-        if (!key || typeof key !== "string") {
-            return fallback;
+    // Synchronize changes made in another browser tab.
+    function handleBrowserStorageUpdated(event) {
+        if (
+            event.key !== null &&
+            event.key !== config.storageKey
+        ) {
+            return;
         }
 
-        const keys = key.split(".");
-        let value = state.data;
+        synchronizeState(loadAppData());
 
-        for (const part of keys) {
-            if (
-                value === null ||
-                value === undefined ||
-                !Object.prototype.hasOwnProperty.call(value, part)
-            ) {
-                return fallback;
-            }
-
-            value = value[part];
-        }
-
-        return value === undefined ? fallback : value;
+        document.dispatchEvent(
+            new CustomEvent("velvet:data-reloaded", {
+                detail: {
+                    type: "external",
+                    data: cloneValue(state.data)
+                }
+            })
+        );
     }
 
-    // ----------------------------------------------------------
-    // 7. UPDATE A SINGLE PROPERTY
-    // ----------------------------------------------------------
+    function refreshData(notify = true) {
+        synchronizeState(loadAppData());
 
-    function set(key, value) {
-        if (!key || typeof key !== "string") {
+        if (notify) {
+            document.dispatchEvent(
+                new CustomEvent("velvet:data-reloaded", {
+                    detail: {
+                        type: "refresh",
+                        data: cloneValue(state.data)
+                    }
+                })
+            );
+        }
+
+        return cloneValue(state.data);
+    }
+
+    // ------------------------------------------------------
+    // 5. SAVE DATA SAFELY
+    // ------------------------------------------------------
+    // Always merge updates with the latest persisted data.
+    // Never rely only on state.data because another module
+    // may have saved newer data in the meantime.
+    // ------------------------------------------------------
+
+    function save(updates) {
+        if (!isPlainObject(updates)) {
+            console.error(
+                "Velvet Day: save() expects an object."
+            );
+
             return false;
         }
 
-        const keys = key.split(".");
+        if (
+            !window.VelvetStorage ||
+            typeof VelvetStorage.saveData !== "function"
+        ) {
+            console.error(
+                "Velvet Day: Storage is unavailable."
+            );
+
+            return false;
+        }
+
+        try {
+            const latestData = loadAppData();
+
+            const updatedData = mergeObjects(
+                latestData,
+                updates
+            );
+
+            const saved = VelvetStorage.saveData(updatedData);
+
+            if (!saved) {
+                console.error(
+                    "Velvet Day: The browser could not persist the changes."
+                );
+
+                return false;
+            }
+
+            // storage.js dispatches velvet:storage-updated.
+            // Synchronize here as an additional safeguard.
+            synchronizeState(updatedData);
+
+            return true;
+
+        } catch (error) {
+            console.error(
+                "Velvet Day: Failed to save application data.",
+                error
+            );
+
+            return false;
+        }
+    }
+
+    // ------------------------------------------------------
+    // 6. READ DATA
+    // ------------------------------------------------------
+
+    function get(key, fallback = null) {
+        if (typeof key !== "string" || !key.trim()) {
+            return fallback;
+        }
+
+        // Refresh before reading in case another module
+        // has written directly through VelvetStorage.
+        synchronizeState(loadAppData());
+
+        const value = getPathValue(state.data, key);
+
+        return value === undefined
+            ? fallback
+            : cloneValue(value);
+    }
+
+    function getAll() {
+        synchronizeState(loadAppData());
+
+        return cloneValue(state.data);
+    }
+
+    // ------------------------------------------------------
+    // 7. SET DATA
+    // Supports:
+    // set("tasks", tasks)
+    // set("settings.theme", "light")
+    // ------------------------------------------------------
+
+    function set(key, value) {
+        if (!isSafePath(key)) {
+            console.error(
+                "Velvet Day: Invalid data key supplied to set()."
+            );
+
+            return false;
+        }
+
         const updates = {};
+        const parts = key.split(".");
         let current = updates;
 
-        // Build nested update objects when necessary.
-        for (let index = 0; index < keys.length - 1; index++) {
-            current[keys[index]] = {};
-            current = current[keys[index]];
+        for (let index = 0; index < parts.length - 1; index++) {
+            current[parts[index]] = {};
+            current = current[parts[index]];
         }
 
-        current[keys[keys.length - 1]] = value;
-
-        // Handle nested settings separately.
-        if (keys[0] === "settings") {
-            return save({
-                settings: updates.settings
-            });
-        }
+        current[parts[parts.length - 1]] = value;
 
         return save(updates);
     }
 
-    // ----------------------------------------------------------
-    // 8. THEME MANAGEMENT
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 8. REMOVE DATA
+    // ------------------------------------------------------
 
-    function applyTheme(theme) {
+    function remove(key) {
+        if (!isSafePath(key)) {
+            console.error(
+                "Velvet Day: Invalid data key supplied to remove()."
+            );
+
+            return false;
+        }
+
+        const latestData = loadAppData();
+        const parts = key.split(".");
+        const finalKey = parts.pop();
+
+        let parent = latestData;
+
+        for (const part of parts) {
+            if (!isPlainObject(parent[part])) {
+                return false;
+            }
+
+            parent = parent[part];
+        }
+
+        if (!Object.prototype.hasOwnProperty.call(parent, finalKey)) {
+            return false;
+        }
+
+        delete parent[finalKey];
+
+        if (
+            !window.VelvetStorage ||
+            typeof VelvetStorage.saveData !== "function"
+        ) {
+            return false;
+        }
+
+        try {
+            const saved = VelvetStorage.saveData(latestData);
+
+            if (saved) {
+                synchronizeState(latestData);
+            }
+
+            return saved;
+
+        } catch (error) {
+            console.error(
+                "Velvet Day: Failed to remove saved data.",
+                error
+            );
+
+            return false;
+        }
+    }
+
+    // ------------------------------------------------------
+    // 9. THEME MANAGEMENT
+    // ------------------------------------------------------
+
+    function updateThemeButtons(theme) {
+        if (
+            window.VelvetTheme &&
+            typeof VelvetTheme.updateThemeButtons === "function"
+        ) {
+            VelvetTheme.updateThemeButtons(theme);
+            return;
+        }
+
+        getAllElements("[data-theme-toggle]").forEach(
+            function (button) {
+                const isDark = theme === "dark";
+
+                button.textContent = isDark ? "☀" : "☾";
+
+                button.title = isDark
+                    ? "Switch to light mode"
+                    : "Switch to dark mode";
+
+                button.setAttribute(
+                    "aria-label",
+                    isDark
+                        ? "Switch to light mode"
+                        : "Switch to dark mode"
+                );
+            }
+        );
+    }
+
+    function applyTheme(theme, savePreference = false) {
         const selectedTheme =
             theme === "light" ? "light" : "dark";
 
-        // Use the dedicated theme module when available.
         if (
             window.VelvetTheme &&
-            typeof window.VelvetTheme.applyTheme === "function"
+            typeof VelvetTheme.applyTheme === "function"
         ) {
-            return window.VelvetTheme.applyTheme(selectedTheme);
+            return VelvetTheme.applyTheme(
+                selectedTheme,
+                savePreference
+            );
         }
 
         document.documentElement.setAttribute(
@@ -220,140 +543,106 @@
 
         updateThemeButtons(selectedTheme);
 
+        if (savePreference) {
+            set("settings.theme", selectedTheme);
+        }
+
         return selectedTheme;
     }
-
-    // ----------------------------------------------------------
-    // 9. UPDATE THEME BUTTONS
-    // ----------------------------------------------------------
-
-    function updateThemeButtons(theme) {
-        const themeButtons = getAllElements("[data-theme-toggle]");
-
-        themeButtons.forEach(function (button) {
-            const isDark = theme === "dark";
-
-            button.setAttribute(
-                "aria-label",
-                isDark ? "Switch to light theme" : "Switch to dark theme"
-            );
-
-            button.setAttribute(
-                "title",
-                isDark ? "Switch to light mode" : "Switch to dark mode"
-            );
-
-            // Update an icon if the button contains one.
-            const icon = button.querySelector("i, svg");
-
-            if (icon) {
-                icon.setAttribute(
-                    "data-lucide",
-                    isDark ? "sun" : "moon"
-                );
-            } else {
-                button.textContent = isDark ? "☀" : "☾";
-            }
-        });
-    }
-
-    // ----------------------------------------------------------
-    // 10. TOGGLE THEME
-    // ----------------------------------------------------------
 
     function toggleTheme() {
         if (
             window.VelvetTheme &&
-            typeof window.VelvetTheme.toggleTheme === "function"
+            typeof VelvetTheme.toggleTheme === "function"
         ) {
-            return window.VelvetTheme.toggleTheme();
+            return VelvetTheme.toggleTheme();
         }
 
         const currentTheme =
             document.documentElement.getAttribute("data-theme") ||
             config.defaultTheme;
 
-        const newTheme =
+        const nextTheme =
             currentTheme === "dark" ? "light" : "dark";
 
-        applyTheme(newTheme);
+        applyTheme(nextTheme, true);
 
-        save({
-            settings: {
-                theme: newTheme
-            }
-        });
-
-        return newTheme;
+        return nextTheme;
     }
 
-    // ----------------------------------------------------------
-    // 11. PAGE TITLE CONFIGURATION
-    // ----------------------------------------------------------
+    function initializeTheme() {
+        const settings = get("settings", {});
 
-    const pageTitles = {
-        dashboard: "Dashboard",
-        tasks: "My Tasks",
-        calendar: "Calendar",
-        notes: "My Notes",
-        "brain-dump": "Brain Dump",
-        checklists: "My Checklists",
-        recurring: "Recurring Tasks",
-        reminders: "Reminders",
-        progress: "My Progress",
-        settings: "Settings"
-    };
+        const savedTheme =
+            settings && settings.theme
+                ? settings.theme
+                : config.defaultTheme;
 
-    // ----------------------------------------------------------
-    // 12. UPDATE PAGE TITLE
-    // ----------------------------------------------------------
+        applyTheme(savedTheme, false);
+    }
+
+    // ------------------------------------------------------
+    // 10. PAGE NAVIGATION
+    // navigation.js manages navigation clicks and browser
+    // history. This function handles the actual page display.
+    // ------------------------------------------------------
 
     function updatePageTitle(pageName) {
-        const title =
-            pageTitles[pageName] || pageName;
+        const pageInfo = pageInformation[pageName] || {
+            title: pageName || config.appName,
+            subtitle: ""
+        };
 
-        // Matches the index.html heading.
-        const pageHeading = getElement("#pageTitle");
+        const titleElement = getElement("#pageTitle");
+        const subtitleElement = getElement("#pageSubtitle");
 
-        if (pageHeading) {
-            pageHeading.textContent = title;
+        const alternateTitle =
+            getElement("[data-page-title]");
+
+        const alternateSubtitle =
+            getElement("[data-page-subtitle]");
+
+        if (titleElement) {
+            titleElement.textContent = pageInfo.title;
         }
 
-        // Also supports an optional data attribute.
-        const alternateHeading = getElement("[data-page-title]");
-
-        if (alternateHeading) {
-            alternateHeading.textContent = title;
+        if (subtitleElement) {
+            subtitleElement.textContent = pageInfo.subtitle;
         }
 
-        document.title = `${title} | ${config.appName}`;
+        if (alternateTitle && alternateTitle !== titleElement) {
+            alternateTitle.textContent = pageInfo.title;
+        }
+
+        if (
+            alternateSubtitle &&
+            alternateSubtitle !== subtitleElement
+        ) {
+            alternateSubtitle.textContent = pageInfo.subtitle;
+        }
+
+        document.title =
+            `${pageInfo.title} | ${config.appName}`;
     }
 
-    // ----------------------------------------------------------
-    // 13. PAGE NAVIGATION
-    // ----------------------------------------------------------
-    // index.html uses:
-    // Navigation: data-page-target="tasks"
-    // Content:    data-page="tasks"
-    // ----------------------------------------------------------
-
-    function navigate(pageName) {
-        if (!pageName || typeof pageName !== "string") {
+    function navigate(pageName, options = {}) {
+        if (
+            typeof pageName !== "string" ||
+            !pageName.trim()
+        ) {
             return false;
         }
 
-        // Find the requested page.
-        const pageSections = getAllElements(".page-section");
+        const pageSections = getAllElements(
+            ".page-section[data-page]"
+        );
 
-        let targetPage = null;
-
-        pageSections.forEach(function (section) {
-            if (section.dataset.page === pageName) {
-                targetPage = section;
+        const targetPage = pageSections.find(
+            function (section) {
+                return section.dataset.page === pageName;
             }
-        });
+        );
 
-        // Do not navigate to a page that does not exist.
         if (!targetPage) {
             console.warn(
                 `Velvet Day: Page "${pageName}" was not found.`
@@ -362,25 +651,16 @@
             return false;
         }
 
+        const previousPage = state.currentPage;
+        const pageChanged = previousPage !== pageName;
+
+        if (pageChanged) {
+            state.previousPage = previousPage;
+        }
+
         state.currentPage = pageName;
 
-        // Update navigation links.
-        const navItems = getAllElements("[data-page-target]");
-
-        navItems.forEach(function (item) {
-            const isActive =
-                item.dataset.pageTarget === pageName;
-
-            item.classList.toggle("active", isActive);
-
-            if (isActive) {
-                item.setAttribute("aria-current", "page");
-            } else {
-                item.removeAttribute("aria-current");
-            }
-        });
-
-        // Show the selected page and hide all others.
+        // Show the selected page and hide the others.
         pageSections.forEach(function (section) {
             const isActive =
                 section.dataset.page === pageName;
@@ -389,73 +669,72 @@
             section.hidden = !isActive;
         });
 
-        updatePageTitle(pageName);
+        // Highlight the matching sidebar link.
+        getAllElements("[data-page-target]").forEach(
+            function (link) {
+                const isActive =
+                    link.dataset.pageTarget === pageName;
 
+                link.classList.toggle("active", isActive);
+
+                if (isActive) {
+                    link.setAttribute("aria-current", "page");
+                } else {
+                    link.removeAttribute("aria-current");
+                }
+            }
+        );
+
+        updatePageTitle(pageName);
         closeMobileSidebar();
 
-        // Notify other modules.
-        document.dispatchEvent(
-            new CustomEvent("velvet:page-changed", {
-                detail: {
-                    page: pageName
-                }
-            })
-        );
+        // navigation.js listens for this event to keep its
+        // own navigation state and URL synchronized.
+        if (pageChanged || options.force) {
+            document.dispatchEvent(
+                new CustomEvent("velvet:page-changed", {
+                    detail: {
+                        page: pageName,
+                        previousPage: previousPage
+                    }
+                })
+            );
+        }
 
         return true;
     }
 
-    // ----------------------------------------------------------
-    // 14. THEME INITIALIZATION
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 11. MOBILE SIDEBAR
+    // ------------------------------------------------------
 
-    function initializeTheme() {
-        const settings = state.data.settings || {};
-
-        const theme =
-            settings.theme || config.defaultTheme;
-
-        applyTheme(theme);
-    }
-
-    // ----------------------------------------------------------
-    // 15. NAVIGATION INITIALIZATION
-    // ----------------------------------------------------------
-
-    function initializeNavigation() {
-        const hashPage = window.location.hash
-            .replace(/^#/, "")
-            .trim();
-
-        const availablePages = Array.from(
-            getAllElements(".page-section")
-        ).map(function (section) {
-            return section.dataset.page;
-        });
-
-        const initialPage = availablePages.includes(hashPage)
-            ? hashPage
-            : config.defaultPage;
-
-        navigate(initialPage);
-    }
-
-    // ----------------------------------------------------------
-    // 16. MOBILE SIDEBAR
-    // ----------------------------------------------------------
-
-    function toggleMobileSidebar() {
+    function setSidebarState(isOpen) {
         const sidebar = getElement("#sidebar");
         const overlay = getElement("#sidebarOverlay");
+        const menuToggle = getElement("#menuToggle");
 
-        if (!sidebar) {
-            return;
+        if (sidebar) {
+            sidebar.classList.toggle("open", isOpen);
         }
-
-        const isOpen = sidebar.classList.toggle("open");
 
         if (overlay) {
             overlay.classList.toggle("active", isOpen);
+            overlay.setAttribute(
+                "aria-hidden",
+                String(!isOpen)
+            );
+        }
+
+        if (menuToggle) {
+            menuToggle.setAttribute(
+                "aria-expanded",
+                String(isOpen)
+            );
+
+            menuToggle.setAttribute(
+                "aria-label",
+                isOpen ? "Close navigation" : "Open navigation"
+            );
         }
 
         document.body.classList.toggle(
@@ -464,157 +743,146 @@
         );
     }
 
-    function closeMobileSidebar() {
+    function toggleMobileSidebar() {
         const sidebar = getElement("#sidebar");
-        const overlay = getElement("#sidebarOverlay");
 
-        if (sidebar) {
-            sidebar.classList.remove("open");
+        if (!sidebar) {
+            return false;
         }
 
-        if (overlay) {
-            overlay.classList.remove("active");
-        }
+        setSidebarState(
+            !sidebar.classList.contains("open")
+        );
 
-        document.body.classList.remove("sidebar-open");
+        return true;
     }
 
-    // ----------------------------------------------------------
-    // 17. GLOBAL EVENT LISTENERS
-    // ----------------------------------------------------------
+    function closeMobileSidebar() {
+        setSidebarState(false);
+    }
+
+    // ------------------------------------------------------
+    // 12. GLOBAL UI EVENTS
+    // ------------------------------------------------------
+
+    function handleGlobalClick(event) {
+        const target = event.target;
+
+        if (!(target instanceof Element)) {
+            return;
+        }
+
+        if (target.closest("#menuToggle")) {
+            event.preventDefault();
+            toggleMobileSidebar();
+            return;
+        }
+
+        if (target.closest("#sidebarClose, #sidebarOverlay")) {
+            event.preventDefault();
+            closeMobileSidebar();
+            return;
+        }
+
+        if (target.closest("[data-theme-toggle]")) {
+            event.preventDefault();
+            toggleTheme();
+        }
+    }
+
+    function handleGlobalKeydown(event) {
+        if (event.key === "Escape") {
+            closeMobileSidebar();
+        }
+    }
 
     function setupEventListeners() {
+        document.addEventListener(
+            "click",
+            handleGlobalClick
+        );
 
-        // ------------------------------------------------------
-        // Navigation clicks
-        // ------------------------------------------------------
+        document.addEventListener(
+            "keydown",
+            handleGlobalKeydown
+        );
 
-        document.addEventListener("click", function (event) {
-            const navButton = event.target.closest(
-                "[data-page-target]"
-            );
+        // Custom event from storage.js.
+        window.addEventListener(
+            "velvet:storage-updated",
+            handleStorageUpdated
+        );
 
-            if (!navButton) {
-                return;
-            }
-
-            event.preventDefault();
-
-            const pageName = navButton.dataset.pageTarget;
-
-            if (navigate(pageName)) {
-                // Update the URL without reloading the application.
-                window.history.replaceState(
-                    null,
-                    "",
-                    `#${pageName}`
-                );
-            }
-        });
-
-        // ------------------------------------------------------
-        // Browser back/forward and hash navigation
-        // ------------------------------------------------------
-
-        window.addEventListener("hashchange", function () {
-            const pageName = window.location.hash
-                .replace(/^#/, "")
-                .trim();
-
-            if (pageName) {
-                navigate(pageName);
-            }
-        });
-
-        // ------------------------------------------------------
-        // Mobile menu button
-        // ------------------------------------------------------
-
-        const menuToggle = getElement("#menuToggle");
-
-        if (menuToggle) {
-            menuToggle.addEventListener(
-                "click",
-                toggleMobileSidebar
-            );
-        }
-
-        // ------------------------------------------------------
-        // Mobile sidebar close button
-        // ------------------------------------------------------
-
-        const sidebarClose = getElement("#sidebarClose");
-
-        if (sidebarClose) {
-            sidebarClose.addEventListener(
-                "click",
-                closeMobileSidebar
-            );
-        }
-
-        // ------------------------------------------------------
-        // Mobile sidebar overlay
-        // ------------------------------------------------------
-
-        const sidebarOverlay = getElement("#sidebarOverlay");
-
-        if (sidebarOverlay) {
-            sidebarOverlay.addEventListener(
-                "click",
-                closeMobileSidebar
-            );
-        }
-
-        // ------------------------------------------------------
-        // Escape key closes the mobile sidebar
-        // ------------------------------------------------------
-
-        document.addEventListener("keydown", function (event) {
-            if (event.key === "Escape") {
-                closeMobileSidebar();
-            }
-        });
+        // Native event when another browser tab changes storage.
+        window.addEventListener(
+            "storage",
+            handleBrowserStorageUpdated
+        );
     }
 
-    // ----------------------------------------------------------
-    // 18. INITIALIZE APPLICATION
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 13. INITIALIZATION
+    // ------------------------------------------------------
+
+    function initializeNavigation() {
+        const hashPage = window.location.hash
+            .replace(/^#/, "")
+            .trim();
+
+        const pageExists = getAllElements(
+            ".page-section[data-page]"
+        ).some(function (section) {
+            return section.dataset.page === hashPage;
+        });
+
+        const initialPage = pageExists
+            ? hashPage
+            : config.defaultPage;
+
+        navigate(initialPage, { force: true });
+    }
 
     function initialize() {
         if (state.isInitialized) {
-            return;
+            return true;
         }
 
         console.log("💜 Starting Velvet Day...");
 
-        // Load saved data.
-        state.data = loadAppData();
+        // Load saved data before feature modules initialize.
+        synchronizeState(loadAppData());
 
-        // Ensure settings are available.
-        if (!state.data.settings) {
-            state.data.settings = {
-                theme: config.defaultTheme
-            };
-        }
-
-        // Initialize theme.
-        initializeTheme();
-
-        // Initialize navigation.
-        initializeNavigation();
-
-        // Register global events.
+        // Listen for storage and global UI events.
         setupEventListeners();
 
-        // Mark the application as initialized.
+        // Apply the saved theme without saving it again.
+        initializeTheme();
+
+        // Display the initial page.
+        // navigation.js handles clicks and browser history.
+        initializeNavigation();
+
         state.isInitialized = true;
 
-        console.log("✨ Velvet Day is ready!");
+        console.log(
+            "✨ Velvet Day application core is ready."
+        );
+
+        document.dispatchEvent(
+            new CustomEvent("velvet:app-core-ready", {
+                detail: {
+                    data: cloneValue(state.data),
+                    page: state.currentPage
+                }
+            })
+        );
+
+        return true;
     }
 
-    // ----------------------------------------------------------
-    // 19. PUBLIC APPLICATION API
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 14. PUBLIC APPLICATION API
+    // ------------------------------------------------------
 
     window.VelvetDay = {
         state: state,
@@ -622,23 +890,30 @@
 
         initialize: initialize,
 
+        // Data access and persistence
         get: get,
+        getAll: getAll,
         set: set,
         save: save,
+        remove: remove,
+        refreshData: refreshData,
 
+        // Navigation
         navigate: navigate,
         updatePageTitle: updatePageTitle,
 
+        // Theme
         applyTheme: applyTheme,
         toggleTheme: toggleTheme,
 
+        // Sidebar
         toggleMobileSidebar: toggleMobileSidebar,
         closeMobileSidebar: closeMobileSidebar
     };
 
-    // ----------------------------------------------------------
-    // 20. START APPLICATION WHEN DOM IS READY
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 15. START APPLICATION
+    // ------------------------------------------------------
 
     if (document.readyState === "loading") {
         document.addEventListener(
