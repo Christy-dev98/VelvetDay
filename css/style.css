@@ -1,0 +1,4129 @@
+
+/* =========================================================
+   VELVET DAY ✿
+   Main Stylesheet
+
+   This file contains the main design and styling for the app.
+   Responsive layouts and animations will be handled separately.
+========================================================= */
+
+
+/* =========================================================
+   1. GOOGLE FONTS
+========================================================= */
+
+/* 
+   DM Sans = clean and readable text
+   Playfair Display = elegant headings
+
+   These fonts are loaded from Google Fonts.
+   If the internet is unavailable, fallback fonts will be used.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+
+/* =========================================================
+   2. ROOT VARIABLES
+========================================================= */
+
+/*
+   CSS variables allow us to reuse colours throughout the app.
+
+   If we want to change the theme later, we only need to
+   update these values instead of editing every component.
+*/
+
+:root {
+
+    /* Background colours */
+    --bg-primary: #17151d;
+    --bg-secondary: #1e1a26;
+    --bg-tertiary: #262130;
+
+    /* Card colours */
+    --card-purple: #30243d;
+    --card-blue: #252b43;
+    --card-pink: #49373f;
+    --card-green: #303d36;
+    --card-brown: #45363a;
+
+    /* Accent colours */
+    --accent-purple: #b99bd6;
+    --accent-purple-light: #d8bce9;
+    --accent-pink: #d2aeb8;
+    --accent-blue: #aebce0;
+    --accent-green: #b9d0bc;
+    --accent-beige: #d8c2ad;
+
+    /* Text colours */
+    --text-primary: #f3edf5;
+    --text-secondary: #c3b7ca;
+    --text-muted: #91879c;
+    --text-dark: #241d2b;
+
+    /* Borders */
+    --border-color: #393141;
+    --border-light: rgba(220, 200, 235, 0.08);
+
+    /* Status colours */
+    --priority-high: #e3a4b2;
+    --priority-medium: #d9c19d;
+    --priority-low: #a9c8b2;
+
+    --success: #a9c9b3;
+    --danger: #d990a1;
+    --warning: #d6b68d;
+
+    /* Shadows */
+    --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.12);
+    --shadow-hover: 0 12px 35px rgba(0, 0, 0, 0.2);
+
+    /* Rounded corners */
+    --radius-small: 12px;
+    --radius-medium: 18px;
+    --radius-large: 24px;
+    --radius-xl: 30px;
+
+    /* Layout */
+    --sidebar-width: 250px;
+
+    /* Transition */
+    --transition: 0.25s ease;
+
+}
+
+
+/* =========================================================
+   3. GLOBAL RESET
+========================================================= */
+
+/*
+   Removes default browser spacing.
+
+   This makes our layout more predictable across different
+   browsers and devices.
+*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* Smooth scrolling when navigating to sections */
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+/* Main body */
+
+body {
+
+    font-family: 'DM Sans', sans-serif;
+
+    background-color: var(--bg-primary);
+
+    color: var(--text-primary);
+
+    min-height: 100vh;
+
+    overflow-x: hidden;
+
+    line-height: 1.6;
+
+}
+
+
+/* Make buttons, inputs and textareas use the same font */
+
+button,
+input,
+textarea,
+select {
+
+    font-family: inherit;
+
+}
+
+
+/* Remove default button styling */
+
+button {
+
+    border: none;
+
+    cursor: pointer;
+
+    color: inherit;
+
+}
+
+
+/* Images should never overflow their containers */
+
+img {
+
+    max-width: 100%;
+
+    display: block;
+
+}
+
+
+/* Remove default link styling */
+
+a {
+
+    text-decoration: none;
+
+    color: inherit;
+
+}
+
+
+/* Scrollbar styling */
+
+::-webkit-scrollbar {
+
+    width: 8px;
+
+    height: 8px;
+
+}
+
+
+::-webkit-scrollbar-track {
+
+    background: var(--bg-primary);
+
+}
+
+
+::-webkit-scrollbar-thumb {
+
+    background: #554661;
+
+    border-radius: 20px;
+
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+
+    background: #786489;
+
+}
+
+
+/* Selection colour */
+
+::selection {
+
+    background: #b99bd6;
+
+    color: #211a29;
+
+}
+
+
+/* =========================================================
+   4. APPLICATION LAYOUT
+========================================================= */
+
+
+/*
+   The application has two main sections:
+
+   1. Sidebar
+   2. Main content
+
+   CSS Grid is used to arrange these sections.
+*/
+
+.app-container {
+
+    display: grid;
+
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+
+    min-height: 100vh;
+
+}
+
+
+/* =========================================================
+   5. SIDEBAR
+========================================================= */
+
+.sidebar {
+
+    background: #1c1923;
+
+    border-right: 1px solid var(--border-color);
+
+    padding: 28px 18px 20px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    min-height: 100vh;
+
+    position: sticky;
+
+    top: 0;
+
+    height: 100vh;
+
+    z-index: 100;
+
+}
+
+
+/* -------------------------
+   Brand / Logo
+-------------------------- */
+
+.brand {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 0 8px;
+
+    margin-bottom: 38px;
+
+}
+
+
+.brand-icon {
+
+    width: 44px;
+
+    height: 44px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: var(--card-purple);
+
+    color: var(--accent-purple-light);
+
+    border-radius: 15px;
+
+    font-size: 24px;
+
+}
+
+
+.brand-text h1 {
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: 22px;
+
+    font-weight: 600;
+
+    letter-spacing: 0.2px;
+
+    color: var(--text-primary);
+
+}
+
+
+.brand-text p {
+
+    font-size: 11px;
+
+    color: var(--text-muted);
+
+    letter-spacing: 0.5px;
+
+}
+
+
+/* -------------------------
+   Navigation
+-------------------------- */
+
+.main-navigation {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+
+}
+
+
+.nav-label {
+
+    font-size: 10px;
+
+    letter-spacing: 1.8px;
+
+    color: var(--text-muted);
+
+    font-weight: 700;
+
+    margin: 12px 10px 8px;
+
+}
+
+
+.nav-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    width: 100%;
+
+    padding: 12px 14px;
+
+    background: transparent;
+
+    color: var(--text-secondary);
+
+    border-radius: 13px;
+
+    text-align: left;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    transition: var(--transition);
+
+}
+
+
+.nav-item i,
+.nav-item svg {
+
+    width: 18px;
+
+    height: 18px;
+
+    stroke-width: 1.8;
+
+    flex-shrink: 0;
+
+}
+
+
+.nav-item:hover {
+
+    background: #2a2433;
+
+    color: var(--text-primary);
+
+    transform: translateX(3px);
+
+}
+
+
+/* Active navigation item */
+
+.nav-item.active {
+
+    background: #362943;
+
+    color: #e0c6ef;
+
+}
+
+
+.nav-item.active i {
+
+    color: var(--accent-purple-light);
+
+}
+
+
+/* Decorative heart beside Checklist */
+
+.nav-decoration {
+
+    margin-left: auto;
+
+    color: var(--accent-pink);
+
+    font-size: 15px;
+
+}
+
+
+/* -------------------------
+   Sidebar Quote
+-------------------------- */
+
+.sidebar-quote {
+
+    margin-top: auto;
+
+    margin-bottom: 20px;
+
+    padding: 20px 17px;
+
+    border-radius: 20px;
+
+    background: linear-gradient(
+        145deg,
+        #382b45,
+        #2a2335
+    );
+
+    border: 1px solid rgba(213, 183, 232, 0.08);
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+
+.quote-decoration {
+
+    font-size: 26px;
+
+    color: #c9a9e3;
+
+    margin-bottom: 8px;
+
+}
+
+
+.sidebar-quote p {
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+    color: #e5d8ed;
+
+    margin-bottom: 10px;
+
+}
+
+
+.sidebar-quote span {
+
+    font-size: 10px;
+
+    color: #b5a1c3;
+
+}
+
+
+/* -------------------------
+   Sidebar Bottom
+-------------------------- */
+
+.sidebar-bottom {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+}
+
+
+.sidebar-footer {
+
+    text-align: center;
+
+    font-size: 10px;
+
+    color: var(--text-muted);
+
+    padding-top: 12px;
+
+}
+
+
+/* =========================================================
+   6. MAIN CONTENT
+========================================================= */
+
+.main-content {
+
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+/* =========================================================
+   7. TOP BAR
+========================================================= */
+
+.topbar {
+
+    height: 82px;
+
+    padding: 0 38px;
+
+    border-bottom: 1px solid var(--border-light);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    background: rgba(23, 21, 29, 0.85);
+
+    backdrop-filter: blur(12px);
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 50;
+
+}
+
+
+/* Search container */
+
+.search-container {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    background: #24202c;
+
+    border: 1px solid #332b3c;
+
+    border-radius: 14px;
+
+    padding: 0 15px;
+
+    height: 44px;
+
+    width: min(380px, 100%);
+
+    transition: var(--transition);
+
+}
+
+
+.search-container i,
+.search-container svg {
+
+    color: var(--text-muted);
+
+    width: 17px;
+
+    height: 17px;
+
+    flex-shrink: 0;
+
+}
+
+
+.search-container:focus-within {
+
+    border-color: #826a96;
+
+    box-shadow: 0 0 0 3px rgba(185, 155, 214, 0.08);
+
+}
+
+
+.search-container input {
+
+    background: transparent;
+
+    border: none;
+
+    outline: none;
+
+    width: 100%;
+
+    color: var(--text-primary);
+
+    font-size: 12px;
+
+}
+
+
+.search-container input::placeholder {
+
+    color: #8e839a;
+
+}
+
+
+/* Header actions */
+
+.header-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+}
+
+
+/* Icon buttons */
+
+.icon-button {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 40px;
+
+    height: 40px;
+
+    border-radius: 12px;
+
+    background: transparent;
+
+    color: var(--text-secondary);
+
+    transition: var(--transition);
+
+    position: relative;
+
+}
+
+
+.icon-button:hover {
+
+    background: var(--bg-tertiary);
+
+    color: var(--accent-purple-light);
+
+}
+
+
+.icon-button svg,
+.icon-button i {
+
+    width: 19px;
+
+    height: 19px;
+
+}
+
+
+/* Notification dot */
+
+.notification-dot {
+
+    width: 7px;
+
+    height: 7px;
+
+    background: var(--accent-pink);
+
+    border-radius: 50%;
+
+    position: absolute;
+
+    top: 8px;
+
+    right: 8px;
+
+}
+
+
+/* Profile avatar */
+
+.profile-avatar {
+
+    width: 38px;
+
+    height: 38px;
+
+    border-radius: 50%;
+
+    background: linear-gradient(
+        135deg,
+        #4b3858,
+        #332b48
+    );
+
+    color: #d8bce9;
+
+    border: 1px solid #695276;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 19px;
+
+}
+
+
+/* Mobile menu button is hidden on desktop */
+
+.mobile-menu-button {
+
+    display: none;
+
+}
+
+
+/* =========================================================
+   8. PAGE CONTENT
+========================================================= */
+
+.page-content {
+
+    padding: 35px 38px 50px;
+
+    max-width: 1600px;
+
+    width: 100%;
+
+    margin: 0 auto;
+
+}
+
+
+/* Each page is hidden by default */
+
+.page-section {
+
+    display: none;
+
+    animation: pageFadeIn 0.25s ease;
+
+}
+
+
+/* Active page */
+
+.page-section.active {
+
+    display: block;
+
+}
+
+
+/* =========================================================
+   9. WELCOME SECTION
+========================================================= */
+
+.welcome-section {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 30px;
+
+    padding: 10px 0;
+
+}
+
+
+.welcome-text .eyebrow {
+
+    margin-bottom: 9px;
+
+}
+
+
+.eyebrow {
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.7px;
+
+    color: var(--accent-purple);
+
+}
+
+
+.welcome-section h2 {
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: clamp(28px, 3vw, 38px);
+
+    font-weight: 500;
+
+    letter-spacing: -0.4px;
+
+    margin-bottom: 5px;
+
+}
+
+
+.welcome-section h2 span {
+
+    color: var(--accent-pink);
+
+}
+
+
+.welcome-section p:not(.eyebrow) {
+
+    color: var(--text-secondary);
+
+    font-size: 13px;
+
+}
+
+
+.welcome-decoration {
+
+    width: 100px;
+
+    height: 100px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: radial-gradient(
+        circle,
+        #40324e 0%,
+        #282230 70%
+    );
+
+    color: #c5a6dc;
+
+    font-size: 40px;
+
+}
+
+
+/* =========================================================
+   10. STATISTICS CARDS
+========================================================= */
+
+.stats-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 18px;
+
+    margin-bottom: 28px;
+
+}
+
+
+.stat-card {
+
+    border-radius: 21px;
+
+    padding: 22px 23px;
+
+    min-height: 145px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(255, 255, 255, 0.025);
+
+    transition: var(--transition);
+
+}
+
+
+.stat-card:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow: var(--shadow-soft);
+
+}
+
+
+.stat-card-purple {
+
+    background: linear-gradient(
+        145deg,
+        #392b48,
+        #30243d
+    );
+
+}
+
+
+.stat-card-blue {
+
+    background: linear-gradient(
+        145deg,
+        #303750,
+        #252b43
+    );
+
+}
+
+
+.stat-card-pink {
+
+    background: linear-gradient(
+        145deg,
+        #49373f,
+        #382d37
+    );
+
+}
+
+
+.stat-card-green {
+
+    background: linear-gradient(
+        145deg,
+        #36463c,
+        #2d3933
+    );
+
+}
+
+
+.stat-card-top {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    color: #d1c3dc;
+
+    font-size: 12px;
+
+}
+
+
+.stat-card-top i,
+.stat-card-top svg {
+
+    width: 18px;
+
+    height: 18px;
+
+    opacity: 0.8;
+
+}
+
+
+.stat-card h3 {
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: 33px;
+
+    font-weight: 500;
+
+    margin: 8px 0 2px;
+
+    color: #f3eaf6;
+
+}
+
+
+.stat-card p {
+
+    font-size: 11px;
+
+    color: #c2b3ce;
+
+}
+
+
+/* =========================================================
+   11. DASHBOARD GRID
+========================================================= */
+
+
+/*
+   Pinterest-inspired grid.
+
+   Cards have different content heights.
+   CSS Grid automatically rearranges them into columns.
+*/
+
+.dashboard-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+
+    align-items: start;
+
+}
+
+
+/* Main card style */
+
+.dashboard-card {
+
+    background: var(--bg-secondary);
+
+    border: 1px solid var(--border-light);
+
+    border-radius: 22px;
+
+    padding: 23px;
+
+    box-shadow: var(--shadow-soft);
+
+    transition: var(--transition);
+
+    min-width: 0;
+
+}
+
+
+.dashboard-card:hover {
+
+    border-color: rgba(185, 155, 214, 0.15);
+
+}
+
+
+/* Card header */
+
+.card-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 20px;
+
+}
+
+
+.card-header h3 {
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: 20px;
+
+    font-weight: 500;
+
+    color: var(--text-primary);
+
+    margin-top: 3px;
+
+}
+
+
+.card-header > i,
+.card-header > svg {
+
+    color: var(--accent-purple);
+
+    width: 20px;
+
+    height: 20px;
+
+}
+
+
+/* =========================================================
+   12. BUTTONS
+========================================================= */
+
+
+/* Primary button */
+
+.primary-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 9px;
+
+    background: #b99bd6;
+
+    color: #251d2d;
+
+    padding: 12px 18px;
+
+    border-radius: 13px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    transition: var(--transition);
+
+    white-space: nowrap;
+
+}
+
+
+.primary-button:hover {
+
+    background: #cfb3e5;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 5px 18px rgba(185, 155, 214, 0.15);
+
+}
+
+
+.primary-button:active {
+
+    transform: scale(0.98);
+
+}
+
+
+.primary-button i,
+.primary-button svg {
+
+    width: 16px;
+
+    height: 16px;
+
+}
+
+
+/* Secondary button */
+
+.secondary-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    background: #30283a;
+
+    color: #d7c5e4;
+
+    border: 1px solid #453750;
+
+    padding: 11px 17px;
+
+    border-radius: 12px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    transition: var(--transition);
+
+}
+
+
+.secondary-button:hover {
+
+    background: #40334d;
+
+}
+
+
+/* Text button */
+
+.text-button {
+
+    background: transparent;
+
+    color: var(--accent-purple);
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    transition: var(--transition);
+
+}
+
+
+.text-button:hover {
+
+    color: var(--accent-purple-light);
+
+}
+
+
+/* Add task inline button */
+
+.add-task-inline {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    width: 100%;
+
+    padding: 13px;
+
+    border-radius: 12px;
+
+    background: #292332;
+
+    border: 1px dashed #57465f;
+
+    color: var(--accent-purple);
+
+    font-size: 12px;
+
+    transition: var(--transition);
+
+    margin-top: 15px;
+
+}
+
+
+.add-task-inline:hover {
+
+    background: #352b40;
+
+    border-color: var(--accent-purple);
+
+}
+
+
+.add-task-inline svg,
+.add-task-inline i {
+
+    width: 16px;
+
+    height: 16px;
+
+}
+
+
+/* =========================================================
+   13. TASK LIST
+========================================================= */
+
+.task-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 11px;
+
+}
+
+
+/* Individual task item */
+
+.task-item {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 12px;
+
+    padding: 13px;
+
+    border-radius: 14px;
+
+    background: #27222f;
+
+    border: 1px solid transparent;
+
+    transition: var(--transition);
+
+}
+
+
+.task-item:hover {
+
+    border-color: #453750;
+
+    background: #2c2635;
+
+}
+
+
+/* Task checkbox */
+
+.task-checkbox {
+
+    width: 19px;
+
+    height: 19px;
+
+    min-width: 19px;
+
+    border: 1.5px solid #77638b;
+
+    border-radius: 6px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: transparent;
+
+    margin-top: 2px;
+
+    transition: var(--transition);
+
+}
+
+
+.task-checkbox:hover {
+
+    border-color: var(--accent-purple);
+
+    background: rgba(185, 155, 214, 0.08);
+
+}
+
+
+.task-checkbox.checked {
+
+    background: var(--accent-purple);
+
+    border-color: var(--accent-purple);
+
+    color: #211a28;
+
+}
+
+
+.task-checkbox svg {
+
+    width: 13px;
+
+    height: 13px;
+
+}
+
+
+/* Task content */
+
+.task-content {
+
+    flex: 1;
+
+    min-width: 0;
+
+}
+
+
+.task-title {
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: var(--text-primary);
+
+    word-break: break-word;
+
+}
+
+
+.task-description {
+
+    font-size: 11px;
+
+    color: var(--text-muted);
+
+    margin-top: 4px;
+
+    word-break: break-word;
+
+}
+
+
+/* Completed task */
+
+.task-item.completed .task-title {
+
+    text-decoration: line-through;
+
+    color: var(--text-muted);
+
+}
+
+
+.task-item.completed {
+
+    opacity: 0.7;
+
+}
+
+
+/* Task metadata */
+
+.task-meta {
+
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    margin-top: 8px;
+
+}
+
+
+.task-tag {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    padding: 4px 8px;
+
+    border-radius: 8px;
+
+    font-size: 9px;
+
+    background: #383142;
+
+    color: #cbb7d9;
+
+}
+
+
+.task-tag svg {
+
+    width: 11px;
+
+    height: 11px;
+
+}
+
+
+/* Priority labels */
+
+.priority-high {
+
+    background: rgba(227, 164, 178, 0.12);
+
+    color: #e3a4b2;
+
+}
+
+
+.priority-medium {
+
+    background: rgba(217, 193, 157, 0.12);
+
+    color: #d9c19d;
+
+}
+
+
+.priority-low {
+
+    background: rgba(169, 200, 178, 0.12);
+
+    color: #a9c8b2;
+
+}
+
+
+/* Task actions */
+
+.task-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    opacity: 0;
+
+    transition: var(--transition);
+
+}
+
+
+.task-item:hover .task-actions {
+
+    opacity: 1;
+
+}
+
+
+.task-action-button {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 30px;
+
+    height: 30px;
+
+    background: transparent;
+
+    color: var(--text-muted);
+
+    border-radius: 8px;
+
+}
+
+
+.task-action-button:hover {
+
+    background: #40354a;
+
+    color: var(--accent-purple-light);
+
+}
+
+
+.task-action-button svg {
+
+    width: 15px;
+
+    height: 15px;
+
+}
+
+
+/* =========================================================
+   14. CATEGORY CARDS
+========================================================= */
+
+.category-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+
+}
+
+
+.category-card {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    padding: 16px;
+
+    border-radius: 16px;
+
+    border: 1px solid transparent;
+
+    transition: var(--transition);
+
+    text-align: left;
+
+    cursor: pointer;
+
+}
+
+
+.category-card:hover {
+
+    transform: translateY(-3px);
+
+    border-color: rgba(255, 255, 255, 0.1);
+
+}
+
+
+.category-card-purple {
+
+    background: #382b46;
+
+}
+
+
+.category-card-blue {
+
+    background: #30364f;
+
+}
+
+
+.category-card-pink {
+
+    background: #49373f;
+
+}
+
+
+.category-card-green {
+
+    background: #334239;
+
+}
+
+
+.category-card-brown {
+
+    background: #44363a;
+
+}
+
+
+.category-icon {
+
+    font-size: 22px;
+
+}
+
+
+.category-name {
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: #f1e8f4;
+
+}
+
+
+.category-task-count {
+
+    font-size: 10px;
+
+    color: var(--text-secondary);
+
+}
+
+
+/* =========================================================
+   15. DAILY PROGRESS CIRCLE
+========================================================= */
+
+.progress-circle-container {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 12px 0;
+
+}
+
+
+/*
+   The circle's background is updated using a CSS variable.
+
+   JavaScript will set --progress-value to a percentage.
+*/
+
+.progress-circle {
+
+    width: 155px;
+
+    height: 155px;
+
+    border-radius: 50%;
+
+    background: conic-gradient(
+        var(--accent-purple) var(--progress-value, 0%),
+        #393142 0
+    );
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    transition: background 0.5s ease;
+
+}
+
+
+.progress-circle-inner {
+
+    width: 125px;
+
+    height: 125px;
+
+    background: var(--bg-secondary);
+
+    border-radius: 50%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.progress-circle-inner span {
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: 27px;
+
+    color: var(--accent-purple-light);
+
+}
+
+
+.progress-circle-inner small {
+
+    font-size: 10px;
+
+    color: var(--text-muted);
+
+}
+
+
+.progress-message {
+
+    text-align: center;
+
+    font-size: 11px;
+
+    color: var(--text-secondary);
+
+    margin-top: 12px;
+
+}
+
+
+/* =========================================================
+   16. BRAIN DUMP
+========================================================= */
+
+.brain-dump-card textarea {
+
+    width: 100%;
+
+    min-height: 160px;
+
+    resize: vertical;
+
+    background: #292330;
+
+    border: 1px solid #3a3044;
+
+    border-radius: 14px;
+
+    padding: 15px;
+
+    color: var(--text-primary);
+
+    font-size: 12px;
+
+    line-height: 1.8;
+
+    outline: none;
+
+    transition: var(--transition);
+
+}
+
+
+.brain-dump-card textarea:focus {
+
+    border-color: #79648c;
+
+}
+
+
+.brain-dump-card textarea::placeholder {
+
+    color: #887d93;
+
+}
+
+
+.save-status {
+
+    margin-top: 8px;
+
+    font-size: 10px;
+
+    color: var(--text-muted);
+
+}
+
+
+/* Full brain dump page */
+
+.brain-dump-main-card {
+
+    background: linear-gradient(
+        145deg,
+        #30243d,
+        #25202f
+    );
+
+    padding: 30px;
+
+}
+
+
+.brain-dump-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+}
+
+
+.brain-dump-header span {
+
+    color: var(--accent-pink);
+
+    font-size: 22px;
+
+}
+
+
+.brain-dump-header p {
+
+    font-size: 10px;
+
+    letter-spacing: 1.5px;
+
+    color: var(--accent-purple);
+
+    font-weight: 700;
+
+}
+
+
+.brain-dump-main-card textarea {
+
+    width: 100%;
+
+    min-height: 350px;
+
+    background: transparent;
+
+    border: none;
+
+    outline: none;
+
+    resize: vertical;
+
+    color: #e9dff0;
+
+    font-size: 14px;
+
+    line-height: 2;
+
+}
+
+
+.brain-dump-main-card textarea::placeholder {
+
+    color: #9f91b0;
+
+}
+
+
+.brain-dump-footer {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+    padding-top: 15px;
+
+    color: var(--text-muted);
+
+    font-size: 10px;
+
+}
+
+
+/* =========================================================
+   17. QUOTE CARDS
+========================================================= */
+
+.quote-card {
+
+    background: linear-gradient(
+        140deg,
+        #433348,
+        #302538
+    );
+
+    position: relative;
+
+    overflow: hidden;
+
+    min-height: 210px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+}
+
+
+.quote-card-decoration {
+
+    font-size: 27px;
+
+    color: #c5a6dc;
+
+    margin-bottom: 20px;
+
+}
+
+
+.quote-label {
+
+    color: #c3a6d8;
+
+    font-size: 9px;
+
+    letter-spacing: 1.5px;
+
+    margin-bottom: 13px;
+
+}
+
+
+.quote-card h3 {
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: 22px;
+
+    line-height: 1.6;
+
+    font-weight: 500;
+
+    color: #f0e3f4;
+
+    max-width: 360px;
+
+}
+
+
+.quote-footer {
+
+    margin-top: 15px;
+
+    font-size: 11px;
+
+    color: #c5b0d3;
+
+}
+
+
+/* =========================================================
+   18. EMPTY STATES
+========================================================= */
+
+.empty-state {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 35px 20px;
+
+    text-align: center;
+
+    gap: 8px;
+
+}
+
+
+.empty-state-icon {
+
+    font-size: 30px;
+
+    margin-bottom: 5px;
+
+}
+
+
+.empty-state h4 {
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: 17px;
+
+    font-weight: 500;
+
+    color: var(--text-primary);
+
+}
+
+
+.empty-state p {
+
+    font-size: 11px;
+
+    color: var(--text-muted);
+
+    max-width: 250px;
+
+}
+
+
+.compact-empty-state {
+
+    padding: 20px;
+
+}
+
+
+.compact-empty-state span {
+
+    font-size: 24px;
+
+}
+
+
+.compact-empty-state p {
+
+    font-size: 11px;
+
+}
+
+
+/* =========================================================
+   19. MINI CALENDAR
+========================================================= */
+
+.mini-calendar-card {
+
+    min-height: 330px;
+
+}
+
+
+.calendar-placeholder {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    min-height: 180px;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+
+}
+
+
+/* Calendar grid */
+
+.calendar-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+
+    gap: 5px;
+
+}
+
+
+.calendar-day-name {
+
+    text-align: center;
+
+    font-size: 9px;
+
+    color: var(--text-muted);
+
+    padding: 8px 0;
+
+}
+
+
+.calendar-day {
+
+    min-height: 38px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 3px;
+
+    border-radius: 10px;
+
+    font-size: 11px;
+
+    color: var(--text-secondary);
+
+    background: transparent;
+
+    transition: var(--transition);
+
+    cursor: pointer;
+
+}
+
+
+.calendar-day:hover {
+
+    background: #352b40;
+
+    color: var(--text-primary);
+
+}
+
+
+.calendar-day.today {
+
+    background: #493654;
+
+    color: #e4c9f2;
+
+    font-weight: 700;
+
+}
+
+
+.calendar-day.selected {
+
+    background: var(--accent-purple);
+
+    color: #251d2b;
+
+}
+
+
+.calendar-day.other-month {
+
+    opacity: 0.3;
+
+}
+
+
+.calendar-day.has-tasks::after {
+
+    content: "";
+
+    width: 4px;
+
+    height: 4px;
+
+    background: var(--accent-pink);
+
+    border-radius: 50%;
+
+}
+
+
+/* Full calendar */
+
+.full-calendar-card {
+
+    position: relative;
+
+}
+
+
+.calendar-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 20px;
+
+}
+
+
+.calendar-header h3 {
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: 22px;
+
+    font-weight: 500;
+
+    min-width: 160px;
+
+    text-align: center;
+
+}
+
+
+.calendar-today-button {
+
+    display: block;
+
+    margin: 0 auto 20px;
+
+}
+
+
+#fullCalendar .calendar-day {
+
+    min-height: 90px;
+
+    background: #27222f;
+
+    border: 1px solid #332c3c;
+
+    justify-content: flex-start;
+
+    align-items: flex-start;
+
+    padding: 12px;
+
+    border-radius: 13px;
+
+}
+
+
+#fullCalendar .calendar-day.today {
+
+    border-color: #9275ad;
+
+    background: #352a41;
+
+}
+
+
+#fullCalendar .calendar-day.selected {
+
+    background: #493653;
+
+    border-color: #b99bd6;
+
+}
+
+
+.calendar-task-dot {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 3px;
+
+    margin-top: 5px;
+
+}
+
+
+.calendar-task-dot span {
+
+    width: 5px;
+
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: var(--accent-pink);
+
+}
+
+
+/* Selected date task panel */
+
+.selected-date-card {
+
+    margin-top: 20px;
+
+}
+
+
+.selected-date-card .task-list {
+
+    margin-top: 10px;
+
+}
+
+
+/* =========================================================
+   20. PAGE HEADINGS
+========================================================= */
+
+.page-heading {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 28px;
+
+}
+
+
+.page-heading h2 {
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: 32px;
+
+    font-weight: 500;
+
+    margin: 5px 0;
+
+}
+
+
+.page-heading h2 span {
+
+    color: var(--accent-pink);
+
+}
+
+
+.page-heading > div > p:last-child {
+
+    font-size: 12px;
+
+    color: var(--text-secondary);
+
+}
+
+
+/* =========================================================
+   21. TASK PAGE FILTERS
+========================================================= */
+
+.task-filter-bar {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.filter-button {
+
+    padding: 10px 17px;
+
+    border-radius: 11px;
+
+    background: #25212e;
+
+    color: var(--text-secondary);
+
+    font-size: 11px;
+
+    border: 1px solid #362e40;
+
+    transition: var(--transition);
+
+}
+
+
+.filter-button:hover {
+
+    background: #342a40;
+
+    color: var(--text-primary);
+
+}
+
+
+.filter-button.active {
+
+    background: #4a3758;
+
+    color: #e4c9f2;
+
+    border-color: #68517a;
+
+}
+
+
+/* Task toolbar */
+
+.task-toolbar {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-bottom: 22px;
+
+}
+
+
+.task-toolbar select {
+
+    background: #25212e;
+
+    border: 1px solid #393143;
+
+    color: var(--text-secondary);
+
+    padding: 10px 13px;
+
+    border-radius: 11px;
+
+    outline: none;
+
+    font-size: 11px;
+
+}
+
+
+/* Full task page list */
+
+.task-page-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+}
+
+
+/* =========================================================
+   22. CHECKLISTS
+========================================================= */
+
+
+/* Template section */
+
+.checklist-templates-card {
+
+    margin-bottom: 25px;
+
+}
+
+
+.template-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+
+    gap: 12px;
+
+}
+
+
+.template-card {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    min-height: 110px;
+
+    padding: 15px 10px;
+
+    border-radius: 16px;
+
+    background: #292331;
+
+    border: 1px solid #393143;
+
+    color: var(--text-secondary);
+
+    transition: var(--transition);
+
+}
+
+
+.template-card:hover {
+
+    background: #362b41;
+
+    border-color: #70577e;
+
+    transform: translateY(-3px);
+
+}
+
+
+.template-icon {
+
+    font-size: 27px;
+
+}
+
+
+.template-card span:last-child {
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+}
+
+
+/* Checklist card grid */
+
+.checklist-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 18px;
+
+}
+
+
+/* Individual checklist card */
+
+.checklist-card {
+
+    background: #292331;
+
+    border: 1px solid #393143;
+
+    border-radius: 20px;
+
+    padding: 21px;
+
+    transition: var(--transition);
+
+    cursor: pointer;
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+
+.checklist-card:hover {
+
+    transform: translateY(-4px);
+
+    box-shadow: var(--shadow-hover);
+
+    border-color: #675278;
+
+}
+
+
+.checklist-card-purple {
+
+    background: linear-gradient(
+        145deg,
+        #352941,
+        #292331
+    );
+
+}
+
+
+.checklist-card-pink {
+
+    background: linear-gradient(
+        145deg,
+        #42313c,
+        #292331
+    );
+
+}
+
+
+.checklist-card-blue {
+
+    background: linear-gradient(
+        145deg,
+        #30364c,
+        #292331
+    );
+
+}
+
+
+.checklist-card-brown {
+
+    background: linear-gradient(
+        145deg,
+        #45353a,
+        #292331
+    );
+
+}
+
+
+.checklist-card-green {
+
+    background: linear-gradient(
+        145deg,
+        #334238,
+        #292331
+    );
+
+}
+
+
+.checklist-card-header {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    margin-bottom: 15px;
+
+}
+
+
+.checklist-card-emoji {
+
+    font-size: 29px;
+
+}
+
+
+.checklist-card-title {
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: 17px;
+
+    font-weight: 500;
+
+    margin-top: 10px;
+
+    color: var(--text-primary);
+
+    word-break: break-word;
+
+}
+
+
+.checklist-card-menu {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 3px;
+
+}
+
+
+.checklist-card-menu button {
+
+    width: 29px;
+
+    height: 29px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: transparent;
+
+    border-radius: 8px;
+
+    color: var(--text-muted);
+
+}
+
+
+.checklist-card-menu button:hover {
+
+    background: rgba(255, 255, 255, 0.08);
+
+    color: var(--text-primary);
+
+}
+
+
+.checklist-card-menu svg {
+
+    width: 15px;
+
+    height: 15px;
+
+}
+
+
+/* Checklist progress */
+
+.checklist-progress-text {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    font-size: 10px;
+
+    color: var(--text-secondary);
+
+    margin-bottom: 8px;
+
+}
+
+
+.progress-bar {
+
+    height: 7px;
+
+    background: #45384d;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+}
+
+
+.progress-bar-fill {
+
+    height: 100%;
+
+    background: linear-gradient(
+        90deg,
+        #a98bc4,
+        #d2b4e5
+    );
+
+    border-radius: 10px;
+
+    transition: width 0.35s ease;
+
+}
+
+
+/* Checklist preview items */
+
+.checklist-preview {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    margin-top: 15px;
+
+}
+
+
+.checklist-preview-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    font-size: 11px;
+
+    color: var(--text-secondary);
+
+}
+
+
+.checklist-preview-item.completed {
+
+    text-decoration: line-through;
+
+    color: var(--text-muted);
+
+}
+
+
+.checklist-preview-checkbox {
+
+    width: 14px;
+
+    height: 14px;
+
+    border: 1px solid #76648a;
+
+    border-radius: 5px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+}
+
+
+.checklist-preview-checkbox.checked {
+
+    background: #a98bc4;
+
+    border-color: #a98bc4;
+
+    color: #251d2b;
+
+}
+
+
+/* Checklist detail modal */
+
+.checklist-details-modal {
+
+    max-width: 600px;
+
+}
+
+
+.checklist-detail-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 12px;
+
+    border-bottom: 1px solid var(--border-light);
+
+}
+
+
+.checklist-detail-item input[type="checkbox"] {
+
+    accent-color: #b99bd6;
+
+    width: 17px;
+
+    height: 17px;
+
+}
+
+
+.checklist-detail-item.completed span {
+
+    text-decoration: line-through;
+
+    color: var(--text-muted);
+
+}
+
+
+.add-checklist-item-form {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 20px;
+
+}
+
+
+.add-checklist-item-form input {
+
+    flex: 1;
+
+    min-width: 0;
+
+}
+
+
+/* =========================================================
+   23. NOTES
+========================================================= */
+
+.notes-toolbar {
+
+    margin-bottom: 22px;
+
+}
+
+
+.notes-search {
+
+    width: 100%;
+
+    max-width: 500px;
+
+}
+
+
+.notes-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 18px;
+
+    align-items: start;
+
+}
+
+
+/* Note cards */
+
+.note-card {
+
+    border-radius: 19px;
+
+    padding: 21px;
+
+    min-height: 180px;
+
+    position: relative;
+
+    transition: var(--transition);
+
+    cursor: pointer;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(255, 255, 255, 0.04);
+
+}
+
+
+.note-card:hover {
+
+    transform: translateY(-4px);
+
+    box-shadow: var(--shadow-hover);
+
+}
+
+
+.note-card-purple {
+
+    background: #392d46;
+
+}
+
+
+.note-card-pink {
+
+    background: #45343f;
+
+}
+
+
+.note-card-blue {
+
+    background: #30364b;
+
+}
+
+
+.note-card-brown {
+
+    background: #45363b;
+
+}
+
+
+.note-card-neutral {
+
+    background: #34303b;
+
+}
+
+
+.note-card h3 {
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: 18px;
+
+    font-weight: 500;
+
+    margin-bottom: 12px;
+
+    color: #f1e8f5;
+
+    word-break: break-word;
+
+}
+
+
+.note-card p {
+
+    font-size: 11px;
+
+    line-height: 1.8;
+
+    color: #d0c2d9;
+
+    white-space: pre-wrap;
+
+    word-break: break-word;
+
+}
+
+
+.note-card-footer {
+
+    margin-top: 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+}
+
+
+.note-date {
+
+    font-size: 9px;
+
+    color: rgba(230, 220, 240, 0.55);
+
+}
+
+
+.note-actions {
+
+    display: flex;
+
+    gap: 5px;
+
+}
+
+
+.note-actions button {
+
+    width: 27px;
+
+    height: 27px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 8px;
+
+    background: rgba(0, 0, 0, 0.1);
+
+    color: #d6c5e1;
+
+}
+
+
+.note-actions button:hover {
+
+    background: rgba(0, 0, 0, 0.2);
+
+}
+
+
+.note-actions svg {
+
+    width: 14px;
+
+    height: 14px;
+
+}
+
+
+/* =========================================================
+   24. PROGRESS PAGE
+========================================================= */
+
+.progress-stats-grid {
+
+    margin-bottom: 22px;
+
+}
+
+
+.weekly-progress-card {
+
+    margin-bottom: 22px;
+
+}
+
+
+/* Weekly bar chart */
+
+.weekly-chart {
+
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: space-around;
+
+    gap: 15px;
+
+    height: 230px;
+
+    padding: 20px 10px 10px;
+
+}
+
+
+.chart-day {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 8px;
+
+    flex: 1;
+
+    height: 100%;
+
+}
+
+
+.chart-bar-container {
+
+    height: 170px;
+
+    width: 100%;
+
+    max-width: 45px;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: center;
+
+    background: #292330;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+}
+
+
+.chart-bar {
+
+    width: 100%;
+
+    background: linear-gradient(
+        180deg,
+        #c7a8df,
+        #8e75ad
+    );
+
+    border-radius: 12px;
+
+    min-height: 3px;
+
+    transition: height 0.5s ease;
+
+}
+
+
+.chart-day-label {
+
+    font-size: 10px;
+
+    color: var(--text-muted);
+
+}
+
+
+.chart-day-count {
+
+    font-size: 10px;
+
+    color: var(--accent-purple);
+
+}
+
+
+/* Achievements */
+
+.achievements-card {
+
+    margin-bottom: 20px;
+
+}
+
+
+#achievementsGrid {
+
+    display: grid;
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 12px;
+
+}
+
+
+.achievement-card {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 20px;
+
+    background: #292330;
+
+    border: 1px solid #393143;
+
+    border-radius: 16px;
+
+    text-align: center;
+
+}
+
+
+.achievement-icon {
+
+    font-size: 26px;
+
+}
+
+
+.achievement-card h4 {
+
+    font-size: 12px;
+
+    color: var(--text-primary);
+
+}
+
+
+.achievement-card p {
+
+    font-size: 10px;
+
+    color: var(--text-muted);
+
+}
+
+
+.achievement-card.locked {
+
+    opacity: 0.45;
+
+    filter: grayscale(0.6);
+
+}
+
+
+/* =========================================================
+   25. REMINDERS
+========================================================= */
+
+.notification-permission-card {
+
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 22px;
+
+    background: linear-gradient(
+        145deg,
+        #30243d,
+        #25202f
+    );
+
+}
+
+
+.notification-permission-content {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    flex: 1;
+
+    min-width: 200px;
+
+}
+
+
+.permission-icon {
+
+    width: 48px;
+
+    height: 48px;
+
+    border-radius: 15px;
+
+    background: #453552;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #d6b8e8;
+
+    flex-shrink: 0;
+
+}
+
+
+.permission-icon svg {
+
+    width: 22px;
+
+    height: 22px;
+
+}
+
+
+.notification-permission-content h3 {
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: 17px;
+
+    font-weight: 500;
+
+    margin-bottom: 4px;
+
+}
+
+
+.notification-permission-content p {
+
+    font-size: 11px;
+
+    color: var(--text-secondary);
+
+    max-width: 400px;
+
+}
+
+
+#notificationPermissionStatus {
+
+    width: 100%;
+
+    font-size: 10px;
+
+    color: var(--text-muted);
+
+}
+
+
+.reminders-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+}
+
+
+.reminder-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 18px;
+
+    background: #292331;
+
+    border: 1px solid #393143;
+
+    border-radius: 17px;
+
+    transition: var(--transition);
+
+}
+
+
+.reminder-card:hover {
+
+    border-color: #685176;
+
+}
+
+
+.reminder-icon {
+
+    width: 43px;
+
+    height: 43px;
+
+    border-radius: 13px;
+
+    background: #3c304a;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #c7a8df;
+
+    flex-shrink: 0;
+
+}
+
+
+.reminder-content {
+
+    flex: 1;
+
+    min-width: 0;
+
+}
+
+
+.reminder-content h3 {
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: var(--text-primary);
+
+}
+
+
+.reminder-content p {
+
+    font-size: 11px;
+
+    color: var(--text-muted);
+
+    margin-top: 3px;
+
+}
+
+
+.reminder-time {
+
+    font-size: 11px;
+
+    color: var(--accent-purple);
+
+    white-space: nowrap;
+
+}
+
+
+/* =========================================================
+   26. MODALS
+========================================================= */
+
+
+/*
+   Modal overlay covers the entire screen.
+
+   JavaScript adds the .show class to make it visible.
+*/
+
+.modal-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(9, 7, 13, 0.78);
+
+    backdrop-filter: blur(8px);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    z-index: 1000;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition: var(--transition);
+
+}
+
+
+.modal-overlay.show {
+
+    opacity: 1;
+
+    visibility: visible;
+
+}
+
+
+/* Modal window */
+
+.modal {
+
+    width: 100%;
+
+    max-width: 520px;
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    background: #211d29;
+
+    border: 1px solid #41364d;
+
+    border-radius: 24px;
+
+    padding: 28px;
+
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+
+    transform: translateY(15px);
+
+    transition: transform 0.25s ease;
+
+}
+
+
+.modal-overlay.show .modal {
+
+    transform: translateY(0);
+
+}
+
+
+/* Modal heading */
+
+.modal-header {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 25px;
+
+}
+
+
+.modal-header h2 {
+
+    font-family: 'Playfair Display', serif;
+
+    font-size: 24px;
+
+    font-weight: 500;
+
+    margin-top: 5px;
+
+}
+
+
+.close-modal-button {
+
+    flex-shrink: 0;
+
+}
+
+
+/* Modal form */
+
+.form-group {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.form-group label {
+
+    font-size: 11px;
+
+    color: var(--text-secondary);
+
+    font-weight: 600;
+
+}
+
+
+.form-group input,
+.form-group textarea,
+.form-group select,
+.add-checklist-item-form input {
+
+    width: 100%;
+
+    background: #2b2533;
+
+    border: 1px solid #41364d;
+
+    border-radius: 12px;
+
+    padding: 12px 14px;
+
+    color: var(--text-primary);
+
+    outline: none;
+
+    font-size: 12px;
+
+    transition: var(--transition);
+
+}
+
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus,
+.add-checklist-item-form input:focus {
+
+    border-color: #806a94;
+
+    box-shadow: 0 0 0 3px rgba(185, 155, 214, 0.07);
+
+}
+
+
+.form-group textarea {
+
+    resize: vertical;
+
+    line-height: 1.7;
+
+}
+
+
+.form-group input::placeholder,
+.form-group textarea::placeholder,
+.add-checklist-item-form input::placeholder {
+
+    color: #8e839a;
+
+}
+
+
+/* Two-column form row */
+
+.form-row {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 15px;
+
+}
+
+
+/* Checkbox labels */
+
+.checkbox-label {
+
+    display: flex !important;
+
+    flex-direction: row !important;
+
+    align-items: center;
+
+    gap: 10px;
+
+    cursor: pointer;
+
+}
+
+
+.checkbox-label input {
+
+    width: 16px !important;
+
+    height: 16px;
+
+    accent-color: #b99bd6;
+
+}
+
+
+/* Small helper text */
+
+.form-help {
+
+    font-size: 10px;
+
+    color: var(--text-muted);
+
+}
+
+
+/* Modal footer */
+
+.modal-footer {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-top: 25px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid var(--border-light);
+
+}
+
+
+/* =========================================================
+   27. TOAST NOTIFICATIONS
+========================================================= */
+
+.toast-container {
+
+    position: fixed;
+
+    top: 100px;
+
+    right: 25px;
+
+    z-index: 2000;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+
+.toast {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    background: #342a40;
+
+    border: 1px solid #584664;
+
+    border-radius: 14px;
+
+    padding: 14px 18px;
+
+    min-width: 250px;
+
+    max-width: 350px;
+
+    color: #e7d9ef;
+
+    font-size: 12px;
+
+    box-shadow: var(--shadow-hover);
+
+}
+
+
+.toast-success {
+
+    border-left: 3px solid var(--success);
+
+}
+
+
+.toast-error {
+
+    border-left: 3px solid var(--danger);
+
+}
+
+
+.toast-info {
+
+    border-left: 3px solid var(--accent-purple);
+
+}
+
+
+/* =========================================================
+   28. MOBILE NAVIGATION
+========================================================= */
+
+.mobile-bottom-navigation {
+
+    display: none;
+
+}
+
+
+/* =========================================================
+   29. UTILITY CLASSES
+========================================================= */
+
+
+/* Hide elements */
+
+.hidden {
+
+    display: none !important;
+
+}
+
+
+/* Full width */
+
+.full-width {
+
+    width: 100%;
+
+}
+
+
+/* Text alignment */
+
+.text-center {
+
+    text-align: center;
+
+}
+
+
+/* Muted text */
+
+.muted {
+
+    color: var(--text-muted);
+
+}
+
+
+/* Flex helpers */
+
+.flex {
+
+    display: flex;
+
+}
+
+
+.flex-between {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+}
+
+
+.flex-center {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+/* =========================================================
+   30. PAGE ANIMATION
+========================================================= */
+
+@keyframes pageFadeIn {
+
+    from {
+
+        opacity: 0;
+
+        transform: translateY(5px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+    }
+
+}
+
+
+/* =========================================================
+   31. FOCUS ACCESSIBILITY
+========================================================= */
+
+
+/*
+   Visible focus outlines help keyboard users understand
+   which element they are currently interacting with.
+*/
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+
+    outline: 2px solid #b99bd6;
+
+    outline-offset: 3px;
+
+}
+
+
+/* =========================================================
+   END OF MAIN STYLESHEET
+========================================================= */
