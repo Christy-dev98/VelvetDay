@@ -1,35 +1,22 @@
-
 /* ==========================================================
    VELVET DAY - NAVIGATION MANAGER
    File: js/navigation.js
 
-   This file manages page navigation throughout Velvet Day.
-
-   Features:
-   - Page switching
-   - Active navigation highlighting
-   - Page title updates
-   - Browser back/forward navigation
-   - Navigation history
-   - Mobile sidebar support
-   - Keyboard navigation shortcuts
-
-   Dependencies:
-   - js/app.js
-
-   IMPORTANT:
-   app.js already contains basic navigation functionality.
-   This file works with VelvetDay.navigate() instead of
-   creating a completely separate navigation system.
-
+   Responsibilities:
+   - Navigate between pages
+   - Update active navigation links
+   - Update page title and subtitle
+   - Support browser Back and Forward
+   - Support keyboard shortcuts
+   - Handle mobile sidebar closing
    ========================================================== */
 
 (function () {
     "use strict";
 
-    // ----------------------------------------------------------
-    // 1. NAVIGATION CONFIGURATION
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 1. PAGE CONFIGURATION
+    // ------------------------------------------------------
 
     const config = {
         defaultPage: "dashboard",
@@ -37,59 +24,50 @@
         pages: {
             dashboard: {
                 title: "Dashboard",
-                subtitle: "Your little corner of productivity"
+                subtitle: "Make today a little more intentional."
             },
-
             tasks: {
                 title: "My Tasks",
-                subtitle: "One step at a time"
+                subtitle: "One step at a time."
             },
-
-            brain: {
-                title: "Brain Dump",
-                subtitle: "Let it all out"
-            },
-
-            notes: {
-                title: "My Notes",
-                subtitle: "Thoughts worth keeping"
-            },
-
-            checklist: {
-                title: "Checklists",
-                subtitle: "Little things, all organized"
-            },
-
             calendar: {
                 title: "Calendar",
-                subtitle: "Make space for what matters"
+                subtitle: "Make space for what matters."
             },
-
+            notes: {
+                title: "My Notes",
+                subtitle: "Thoughts worth keeping."
+            },
+            "brain-dump": {
+                title: "Brain Dump",
+                subtitle: "Let your thoughts out."
+            },
+            checklists: {
+                title: "My Checklists",
+                subtitle: "Little things, all organized."
+            },
             recurring: {
                 title: "Recurring Tasks",
-                subtitle: "Build little habits"
+                subtitle: "Build little habits."
             },
-
             reminders: {
                 title: "Reminders",
-                subtitle: "Things you don't want to forget"
+                subtitle: "Things you don't want to forget."
             },
-
             progress: {
                 title: "My Progress",
-                subtitle: "Look how far you've come"
+                subtitle: "Look how far you've come."
             },
-
             settings: {
                 title: "Settings",
-                subtitle: "Make Velvet Day yours"
+                subtitle: "Make Velvet Day yours."
             }
         }
     };
 
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
     // 2. NAVIGATION STATE
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
 
     const state = {
         currentPage: config.defaultPage,
@@ -98,52 +76,43 @@
         isInitialized: false
     };
 
-    // ----------------------------------------------------------
-    // 3. HELPER - GET PAGE INFORMATION
-    // ----------------------------------------------------------
-    // Returns the information configured for a page.
-    // ----------------------------------------------------------
+    let navigationInProgress = false;
+
+    // ------------------------------------------------------
+    // 3. PAGE HELPERS
+    // ------------------------------------------------------
 
     function getPageInfo(pageName) {
         return config.pages[pageName] || {
-            title: pageName,
+            title: pageName || "Dashboard",
             subtitle: ""
         };
     }
 
-    // ----------------------------------------------------------
-    // 4. CHECK WHETHER A PAGE EXISTS
-    // ----------------------------------------------------------
-
     function pageExists(pageName) {
-        return Object.prototype.hasOwnProperty.call(
-            config.pages,
-            pageName
-        );
+        if (
+            !pageName ||
+            !Object.prototype.hasOwnProperty.call(config.pages, pageName)
+        ) {
+            return false;
+        }
+
+        return Array.from(
+            document.querySelectorAll(".page-section[data-page]")
+        ).some(function (section) {
+            return section.dataset.page === pageName;
+        });
     }
 
-    // ----------------------------------------------------------
-    // 5. UPDATE PAGE HEADING
-    // ----------------------------------------------------------
-    // Updates elements displaying the current page title
-    // and subtitle.
-    //
-    // Expected optional HTML:
-    //
-    // <h1 data-page-title></h1>
-    // <p data-page-subtitle></p>
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 4. UPDATE PAGE HEADING
+    // ------------------------------------------------------
 
     function updatePageHeading(pageName) {
         const pageInfo = getPageInfo(pageName);
 
-        const titleElement = document.querySelector(
-            "[data-page-title]"
-        );
-
-        const subtitleElement = document.querySelector(
-            "[data-page-subtitle]"
-        );
+        const titleElement = document.getElementById("pageTitle");
+        const subtitleElement = document.getElementById("pageSubtitle");
 
         if (titleElement) {
             titleElement.textContent = pageInfo.title;
@@ -153,82 +122,78 @@
             subtitleElement.textContent = pageInfo.subtitle;
         }
 
-        // Update the browser tab title
+        const alternateTitle =
+            document.querySelector("[data-page-title]");
+
+        const alternateSubtitle =
+            document.querySelector("[data-page-subtitle]");
+
+        if (alternateTitle && alternateTitle !== titleElement) {
+            alternateTitle.textContent = pageInfo.title;
+        }
+
+        if (
+            alternateSubtitle &&
+            alternateSubtitle !== subtitleElement
+        ) {
+            alternateSubtitle.textContent = pageInfo.subtitle;
+        }
+
         document.title = `${pageInfo.title} | Velvet Day`;
     }
 
-    // ----------------------------------------------------------
-    // 6. UPDATE ACTIVE NAVIGATION ITEM
-    // ----------------------------------------------------------
-    // Highlights the navigation item for the selected page.
-    //
-    // Expected HTML:
-    //
-    // <button data-page="dashboard">Dashboard</button>
-    // <button data-page="tasks">Tasks</button>
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 5. UPDATE ACTIVE NAVIGATION LINK
+    // ------------------------------------------------------
 
     function updateActiveNavigation(pageName) {
-        const navigationItems = document.querySelectorAll(
-            "[data-page]"
-        );
+        document.querySelectorAll("[data-page-target]").forEach(
+            function (item) {
+                const isActive =
+                    item.dataset.pageTarget === pageName;
 
-        navigationItems.forEach(function (item) {
-            const isActive = item.dataset.page === pageName;
+                item.classList.toggle("active", isActive);
 
-            item.classList.toggle("active", isActive);
-
-            if (isActive) {
-                item.setAttribute("aria-current", "page");
-            } else {
-                item.removeAttribute("aria-current");
+                if (isActive) {
+                    item.setAttribute("aria-current", "page");
+                } else {
+                    item.removeAttribute("aria-current");
+                }
             }
-        });
+        );
     }
 
-    // ----------------------------------------------------------
-    // 7. SHOW PAGE CONTENT
-    // ----------------------------------------------------------
-    // Makes the selected page visible and hides other pages.
-    //
-    // Expected HTML:
-    //
-    // <section data-page-content="dashboard"></section>
-    // <section data-page-content="tasks"></section>
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 6. FALLBACK PAGE DISPLAY
+    // ------------------------------------------------------
 
     function showPageContent(pageName) {
-        const pageSections = document.querySelectorAll(
-            "[data-page-content]"
-        );
-
-        pageSections.forEach(function (section) {
+        document.querySelectorAll(
+            ".page-section[data-page]"
+        ).forEach(function (section) {
             const isActive =
-                section.dataset.pageContent === pageName;
+                section.dataset.page === pageName;
 
             section.classList.toggle("active", isActive);
-
             section.hidden = !isActive;
         });
     }
 
-    // ----------------------------------------------------------
-    // 8. CLOSE MOBILE SIDEBAR
-    // ----------------------------------------------------------
-    // Uses the sidebar methods from VelvetDay when available.
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 7. CLOSE MOBILE SIDEBAR
+    // ------------------------------------------------------
 
     function closeMobileSidebar() {
         if (
             window.VelvetDay &&
-            typeof VelvetDay.closeMobileSidebar === "function"
+            typeof window.VelvetDay.closeMobileSidebar === "function"
         ) {
-            VelvetDay.closeMobileSidebar();
+            window.VelvetDay.closeMobileSidebar();
             return;
         }
 
-        const sidebar = document.querySelector("#sidebar");
-        const overlay = document.querySelector("#sidebarOverlay");
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("sidebarOverlay");
 
         if (sidebar) {
             sidebar.classList.remove("open");
@@ -241,14 +206,30 @@
         document.body.classList.remove("sidebar-open");
     }
 
-    // ----------------------------------------------------------
-    // 9. NAVIGATE TO PAGE
-    // ----------------------------------------------------------
-    // This function delegates the actual page switching to
-    // VelvetDay.navigate(), which is defined in app.js.
-    //
-    // It also manages our navigation state and history.
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 8. BROWSER HISTORY
+    // ------------------------------------------------------
+
+    function updateBrowserHistory(pageName, replace) {
+        const method = replace ? "replaceState" : "pushState";
+
+        try {
+            window.history[method](
+                { page: pageName },
+                "",
+                `#${pageName}`
+            );
+        } catch (error) {
+            console.warn(
+                "Velvet Day: Could not update browser history.",
+                error
+            );
+        }
+    }
+
+    // ------------------------------------------------------
+    // 9. NAVIGATE BETWEEN PAGES
+    // ------------------------------------------------------
 
     function navigate(pageName, options = {}) {
         if (!pageExists(pageName)) {
@@ -261,60 +242,67 @@
 
         const previousPage = state.currentPage;
 
-        // Prevent unnecessary navigation to the same page
-        if (
-            previousPage === pageName &&
-            !options.force
-        ) {
+        if (previousPage === pageName && !options.force) {
+            closeMobileSidebar();
             return true;
         }
 
-        state.previousPage = previousPage;
-
-        // Add previous page to history
-        if (!options.fromHistory && previousPage) {
+        if (
+            !options.fromHistory &&
+            previousPage &&
+            previousPage !== pageName
+        ) {
             state.history.push(previousPage);
         }
 
+        state.previousPage =
+            previousPage === pageName
+                ? state.previousPage
+                : previousPage;
+
         state.currentPage = pageName;
 
-        // Use the main application navigation function
+        let navigationSucceeded = true;
+
         if (
             window.VelvetDay &&
-            typeof VelvetDay.navigate === "function"
+            typeof window.VelvetDay.navigate === "function"
         ) {
-            VelvetDay.navigate(pageName);
+            navigationInProgress = true;
+
+            try {
+                navigationSucceeded =
+                    window.VelvetDay.navigate(pageName) !== false;
+            } catch (error) {
+                navigationSucceeded = false;
+
+                console.error(
+                    "Velvet Day: Navigation failed.",
+                    error
+                );
+            } finally {
+                navigationInProgress = false;
+            }
         } else {
-            // Fallback if app.js navigation is unavailable
-            updateActiveNavigation(pageName);
             showPageContent(pageName);
         }
 
-        // Ensure title and subtitle are updated
-        updatePageHeading(pageName);
-
-        // Close mobile sidebar
-        closeMobileSidebar();
-
-        // Update browser history
-        if (!options.fromHistory && options.updateBrowserHistory !== false) {
-            try {
-                history.pushState(
-                    {
-                        page: pageName
-                    },
-                    "",
-                    `#${pageName}`
-                );
-            } catch (error) {
-                console.warn(
-                    "Velvet Day: Could not update browser history.",
-                    error
-                );
-            }
+        if (!navigationSucceeded) {
+            state.currentPage = previousPage;
+            return false;
         }
 
-        // Notify other scripts
+        updateActiveNavigation(pageName);
+        updatePageHeading(pageName);
+        closeMobileSidebar();
+
+        if (options.updateBrowserHistory !== false) {
+            updateBrowserHistory(
+                pageName,
+                Boolean(options.replaceHistory)
+            );
+        }
+
         document.dispatchEvent(
             new CustomEvent("velvet:navigation", {
                 detail: {
@@ -327,227 +315,254 @@
         return true;
     }
 
-    // ----------------------------------------------------------
-    // 10. GO BACK TO PREVIOUS PAGE
-    // ----------------------------------------------------------
-    // Returns to the previous page stored in navigation history.
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 10. GO BACK
+    // ------------------------------------------------------
 
     function goBack() {
         if (state.history.length === 0) {
-            navigate(config.defaultPage);
-            return;
+            return navigate(config.defaultPage, {
+                force: true
+            });
         }
 
         const previousPage = state.history.pop();
 
-        navigate(previousPage, {
+        return navigate(previousPage, {
             fromHistory: true,
-            updateBrowserHistory: false
+            updateBrowserHistory: true,
+            replaceHistory: true,
+            force: true
         });
     }
 
-    // ----------------------------------------------------------
-    // 11. HANDLE BROWSER BACK/FORWARD BUTTONS
-    // ----------------------------------------------------------
-    // Listens to the browser's popstate event.
-    //
-    // This allows the user to navigate using the browser's
-    // Back and Forward buttons.
-    // ----------------------------------------------------------
-
-    function handleBrowserHistory(event) {
-        const pageName =
-            event.state && event.state.page
-                ? event.state.page
-                : window.location.hash.replace("#", "");
-
-        if (pageExists(pageName)) {
-            navigate(pageName, {
-                fromHistory: true,
-                updateBrowserHistory: false,
-                force: true
-            });
-        } else {
-            navigate(config.defaultPage, {
-                fromHistory: true,
-                updateBrowserHistory: false,
-                force: true
-            });
-        }
-    }
-
-    // ----------------------------------------------------------
-    // 12. HANDLE NAVIGATION CLICK
-    // ----------------------------------------------------------
-    // Uses event delegation so dynamically created navigation
-    // elements also work.
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 11. HANDLE NAVIGATION CLICK
+    // IMPORTANT:
+    // Only navigation links use data-page-target.
+    // Page sections use data-page.
+    // ------------------------------------------------------
 
     function handleNavigationClick(event) {
-        const navigationButton = event.target.closest("[data-page]");
+        const target = event.target;
 
-        if (!navigationButton) {
+        if (!(target instanceof Element)) {
             return;
         }
 
-        const pageName = navigationButton.dataset.page;
+        const navigationLink =
+            target.closest("[data-page-target]");
+
+        if (!navigationLink) {
+            return;
+        }
+
+        const pageName = navigationLink.dataset.pageTarget;
 
         if (!pageName) {
             return;
         }
 
         event.preventDefault();
+        event.stopImmediatePropagation();
 
         navigate(pageName);
     }
 
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 12. HANDLE BROWSER BACK AND FORWARD
+    // ------------------------------------------------------
+
+    function handleBrowserHistory(event) {
+        const hashPage = window.location.hash
+            .replace(/^#/, "")
+            .trim();
+
+        const statePage =
+            event.state && event.state.page;
+
+        const pageName = pageExists(statePage)
+            ? statePage
+            : hashPage;
+
+        const destination = pageExists(pageName)
+            ? pageName
+            : config.defaultPage;
+
+        navigate(destination, {
+            fromHistory: true,
+            updateBrowserHistory: false,
+            force: true
+        });
+    }
+
+    // ------------------------------------------------------
     // 13. KEYBOARD SHORTCUTS
-    // ----------------------------------------------------------
-    // Alt + 1 -> Dashboard
-    // Alt + 2 -> Tasks
-    // Alt + 3 -> Brain Dump
-    // Alt + 4 -> Notes
-    // Alt + 5 -> Calendar
     //
-    // Escape -> Close mobile sidebar
-    // ----------------------------------------------------------
+    // Alt + 1: Dashboard
+    // Alt + 2: Tasks
+    // Alt + 3: Brain Dump
+    // Alt + 4: Notes
+    // Alt + 5: Calendar
+    // Alt + 6: Checklists
+    // Alt + 7: Recurring Tasks
+    // Alt + 8: Reminders
+    // Alt + 9: Progress
+    //
+    // Escape: Close mobile sidebar
+    // ------------------------------------------------------
 
     function handleKeyboardShortcuts(event) {
-        // Ignore shortcuts while typing in input fields
-        const activeElement = document.activeElement;
-
-        const isTyping =
-            activeElement &&
-            (
-                activeElement.tagName === "INPUT" ||
-                activeElement.tagName === "TEXTAREA" ||
-                activeElement.tagName === "SELECT" ||
-                activeElement.isContentEditable
-            );
-
-        // Escape closes mobile sidebar
         if (event.key === "Escape") {
             closeMobileSidebar();
             return;
         }
 
-        if (isTyping) {
+        const activeElement = document.activeElement;
+
+        const isTyping = activeElement && (
+            activeElement.tagName === "INPUT" ||
+            activeElement.tagName === "TEXTAREA" ||
+            activeElement.tagName === "SELECT" ||
+            activeElement.isContentEditable
+        );
+
+        if (
+            isTyping ||
+            !event.altKey ||
+            event.ctrlKey ||
+            event.shiftKey
+        ) {
             return;
         }
 
-        // Alt + number shortcuts
-        if (event.altKey && !event.ctrlKey && !event.shiftKey) {
-            const shortcutPages = {
-                "1": "dashboard",
-                "2": "tasks",
-                "3": "brain",
-                "4": "notes",
-                "5": "calendar"
-            };
+        const shortcuts = {
+            "1": "dashboard",
+            "2": "tasks",
+            "3": "brain-dump",
+            "4": "notes",
+            "5": "calendar",
+            "6": "checklists",
+            "7": "recurring",
+            "8": "reminders",
+            "9": "progress"
+        };
 
-            const pageName = shortcutPages[event.key];
+        const pageName = shortcuts[event.key];
 
-            if (pageName) {
-                event.preventDefault();
-                navigate(pageName);
-            }
+        if (pageName) {
+            event.preventDefault();
+            navigate(pageName);
         }
     }
 
-    // ----------------------------------------------------------
-    // 14. LISTEN FOR NAVIGATION FROM OTHER SCRIPTS
-    // ----------------------------------------------------------
-    // Other JavaScript files can request navigation by dispatching:
-    //
-    // document.dispatchEvent(
-    //     new CustomEvent("velvet:go-to-page", {
-    //         detail: { page: "notes" }
-    //     })
-    // );
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 14. EXTERNAL NAVIGATION EVENT
+    // ------------------------------------------------------
 
     function handleExternalNavigation(event) {
-        const pageName = event.detail && event.detail.page;
+        const pageName =
+            event.detail && event.detail.page;
 
         if (pageName) {
             navigate(pageName);
         }
     }
 
-    // ----------------------------------------------------------
-    // 15. INITIALIZE NAVIGATION
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 15. SYNCHRONIZE WITH APP.JS NAVIGATION
+    // ------------------------------------------------------
+
+    function handleAppPageChanged(event) {
+        if (navigationInProgress) {
+            return;
+        }
+
+        const pageName =
+            event.detail && event.detail.page;
+
+        if (!pageExists(pageName)) {
+            return;
+        }
+
+        if (state.currentPage !== pageName) {
+            state.previousPage = state.currentPage;
+            state.currentPage = pageName;
+        }
+
+        updateActiveNavigation(pageName);
+        updatePageHeading(pageName);
+        closeMobileSidebar();
+
+        if (window.location.hash !== `#${pageName}`) {
+            updateBrowserHistory(pageName, true);
+        }
+    }
+
+    // ------------------------------------------------------
+    // 16. INITIALIZE NAVIGATION
+    // ------------------------------------------------------
 
     function initialize() {
         if (state.isInitialized) {
             return;
         }
 
-        // Read the initial page from the URL
-        const initialPage = window.location.hash.replace("#", "");
+        const requestedPage = window.location.hash
+            .replace(/^#/, "")
+            .trim();
 
-        const pageToOpen = pageExists(initialPage)
-            ? initialPage
+        const initialPage = pageExists(requestedPage)
+            ? requestedPage
             : config.defaultPage;
 
-        // Register click handler
         document.addEventListener(
             "click",
-            handleNavigationClick
+            handleNavigationClick,
+            true
         );
 
-        // Register browser history handler
         window.addEventListener(
             "popstate",
             handleBrowserHistory
         );
 
-        // Register keyboard shortcuts
         document.addEventListener(
             "keydown",
             handleKeyboardShortcuts
         );
 
-        // Register external navigation
         document.addEventListener(
             "velvet:go-to-page",
             handleExternalNavigation
         );
 
-        // Initialize page
-        navigate(pageToOpen, {
+        document.addEventListener(
+            "velvet:page-changed",
+            handleAppPageChanged
+        );
+
+        state.currentPage = config.defaultPage;
+
+        navigate(initialPage, {
             force: true,
             updateBrowserHistory: false
         });
 
-        // If no valid hash exists, set the default page hash
-        if (!pageExists(initialPage)) {
-            try {
-                history.replaceState(
-                    {
-                        page: pageToOpen
-                    },
-                    "",
-                    `#${pageToOpen}`
-                );
-            } catch (error) {
-                console.warn(
-                    "Velvet Day: Could not initialize browser history.",
-                    error
-                );
-            }
+        if (window.location.hash !== `#${initialPage}`) {
+            updateBrowserHistory(initialPage, true);
         }
 
         state.isInitialized = true;
 
-        console.log("✨ Velvet Day navigation initialized.");
+        console.log(
+            "Velvet Day navigation initialized."
+        );
     }
 
-    // ----------------------------------------------------------
-    // 16. PUBLIC API
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 17. PUBLIC API
+    // ------------------------------------------------------
 
     window.VelvetNavigation = {
         config: config,
@@ -569,14 +584,15 @@
         pageExists: pageExists
     };
 
-    // ----------------------------------------------------------
-    // 17. START NAVIGATION AFTER DOM IS READY
-    // ----------------------------------------------------------
+    // ------------------------------------------------------
+    // 18. START WHEN DOM IS READY
+    // ------------------------------------------------------
 
     if (document.readyState === "loading") {
         document.addEventListener(
             "DOMContentLoaded",
-            initialize
+            initialize,
+            { once: true }
         );
     } else {
         initialize();
