@@ -1,470 +1,909 @@
+/* =========================================================
+   VELVET DAY - STORAGE
+   Handles local storage, data management, backups and imports.
+   ========================================================= */
 
-/* ==========================================================
-   VELVET DAY - LOCAL STORAGE
-   File: js/storage.js
-
-   This file handles saving and loading app data using
-   the browser's LocalStorage.
-
-   No database or backend is required.
-
-   Data stored:
-   - Tasks
-   - Brain dumps
-   - Notes
-   - Checklists
-   - Recurring tasks
-   - Reminders
-   - Calendar events
-   - User settings
-   ========================================================== */
-
-(function () {
+window.VelvetStorage = (() => {
     "use strict";
 
-    // ----------------------------------------------------------
-    // 1. STORAGE CONFIGURATION
-    // ----------------------------------------------------------
+    // -----------------------------------------------------
+    // Configuration
+    // -----------------------------------------------------
 
-    const STORAGE_KEY = "velvetDayData";
-    const STORAGE_VERSION = 1;
+    const STORAGE_KEY = "velvet-day:data:v1";
+    const RECOVERY_KEY = "velvet-day:data:recovery";
+    const BACKUP_FORMAT = "velvet-day-backup";
+    const BACKUP_VERSION = 1;
 
-    // ----------------------------------------------------------
-    // 2. DEFAULT DATA
-    // ----------------------------------------------------------
-    // This is the structure used when the app is opened for
-    // the first time or when no saved data exists.
-    // ----------------------------------------------------------
+    const DEFAULT_DATA = {
+        version: 1,
 
-    const defaultData = {
-        version: STORAGE_VERSION,
-
-        // Main tasks
         tasks: [],
-
-        // Quick thoughts, ideas, and brain dumps
-        brainDump: [],
-
-        // Personal notes
         notes: [],
-
-        // Checklists and checklist templates
         checklists: [],
-
-        // Recurring task definitions
-        recurringTasks: [],
-
-        // Reminders
+        brainDump: [],
+        recurring: [],
         reminders: [],
 
-        // Calendar events
-        calendarEvents: [],
-
-        // App preferences
         settings: {
             theme: "dark",
-            notificationsEnabled: false,
-            startWeekOn: "monday",
-            completedTasksVisible: true
+            remindersEnabled: true,
+            reminderTime: "09:00",
+            reminderAdvanceMinutes: 0,
+            weekStartsOn: "monday",
+            showCompletedTasks: true,
+            compactMode: false
         },
 
-        // Track daily activity for progress charts
-        activity: {}
+        metadata: {
+            createdAt: null,
+            updatedAt: null
+        }
     };
 
-    // ----------------------------------------------------------
-    // 3. MEMORY FALLBACK
-    // ----------------------------------------------------------
-    // If browser storage is unavailable, the app can still work
-    // temporarily using memory.
-    //
-    // Note: memory data will disappear when the page is refreshed.
-    // ----------------------------------------------------------
+    // In-memory fallback for environments where localStorage
+    // is unavailable.
+    let memoryFallback = null;
 
-    let memoryData = null;
+    // Tracks whether existing saved data was corrupted.
+    let corruptedDataDetected = false;
 
-    // ----------------------------------------------------------
-    // 4. HELPER - CREATE A SAFE COPY
-    // ----------------------------------------------------------
-    // Prevents accidental changes to the original object when
-    // returning data to another script.
-    // ----------------------------------------------------------
+    // -----------------------------------------------------
+    // Utility functions
+    // -----------------------------------------------------
 
-    function cloneData(data) {
-        return JSON.parse(JSON.stringify(data));
+    function deepClone(value) {
+        return JSON.parse(JSON.stringify(value));
     }
 
-    // ----------------------------------------------------------
-    // 5. HELPER - CREATE DEFAULT DATA
-    // ----------------------------------------------------------
-
-    function createDefaultData() {
-        return cloneData(defaultData);
+    function getTimestamp() {
+        return new Date().toISOString();
     }
 
-    // ----------------------------------------------------------
-    // 6. HELPER - CHECK STORAGE AVAILABILITY
-    // ----------------------------------------------------------
+    function generateId() {
+        if (window.crypto && typeof window.crypto.randomUUID === "function") {
+            return window.crypto.randomUUID();
+        }
+
+        return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+    }
+
+    function isObject(value) {
+        return (
+            value !== null &&
+            typeof value === "object" &&
+            !Array.isArray(value)
+        );
+    }
 
     function isStorageAvailable() {
         try {
             const testKey = "__velvet_day_storage_test__";
 
-            localStorage.setItem(testKey, "test");
-            localStorage.removeItem(testKey);
+            window.localStorage.setItem(testKey, "test");
+            window.localStorage.removeItem(testKey);
 
             return true;
         } catch (error) {
-            console.warn("Velvet Day: LocalStorage is unavailable.", error);
             return false;
         }
     }
 
-    // ----------------------------------------------------------
-    // 7. LOAD DATA
-    // ----------------------------------------------------------
-    // Reads the saved data from LocalStorage.
-    //
-    // If no saved data exists:
-    // - Creates default data
-    // - Saves it
-    // - Returns it
-    //
-    // If saved data exists:
-    // - Parses it
-    // - Adds any newly introduced default properties
-    //   that might be missing from an older saved version
-    // ----------------------------------------------------------
-
-    function loadData() {
+    function getLocalStorage() {
         try {
-            if (!isStorageAvailable()) {
-                if (!memoryData) {
-                    memoryData = createDefaultData();
-                }
+            return window.localStorage;
+        } catch (error) {
+            return null;
+        }
+    }
 
-                return cloneData(memoryData);
+    function safeParse(value) {
+        try {
+            return JSON.parse(value);
+        } catch (error) {
+            console.error("Velvet Day: Unable to parse saved data.", error);
+            return null;
+        }
+    }
+
+    // -----------------------------------------------------
+    // Default data
+    // -----------------------------------------------------
+
+    function createDefaultData() {
+        const defaults = deepClone(DEFAULT_DATA);
+        const timestamp = getTimestamp();
+
+        defaults.metadata.createdAt = timestamp;
+        defaults.metadata.updatedAt = timestamp;
+
+        return defaults;
+    }
+
+    // -----------------------------------------------------
+    // Recovery backup
+    // -----------------------------------------------------
+
+    function preserveCorruptedData(rawData) {
+        if (typeof rawData !== "string" || rawData.length === 0) {
+            return false;
+        }
+
+        const storage = getLocalStorage();
+
+        if (!storage) {
+            return false;
+        }
+
+        try {
+            const existingRecovery = safeParse(
+                storage.getItem(RECOVERY_KEY)
+            );
+
+            // Do not replace an existing recovery backup.
+            // The first corrupted version is preserved.
+            if (existingRecovery && existingRecovery.rawData) {
+                return true;
             }
 
-            const savedData = localStorage.getItem(STORAGE_KEY);
-
-            // First-time app installation
-            if (!savedData) {
-                const freshData = createDefaultData();
-
-                saveData(freshData);
-
-                return freshData;
-            }
-
-            // Convert saved JSON text back into a JavaScript object
-            const parsedData = JSON.parse(savedData);
-
-            // Ensure the stored data is an object
-            if (
-                !parsedData ||
-                typeof parsedData !== "object" ||
-                Array.isArray(parsedData)
-            ) {
-                console.warn("Velvet Day: Invalid saved data. Using defaults.");
-
-                const freshData = createDefaultData();
-                saveData(freshData);
-
-                return freshData;
-            }
-
-            // Merge default structure with saved structure.
-            // This helps when new app features are added later.
-            const mergedData = {
-                ...createDefaultData(),
-                ...parsedData,
-
-                settings: {
-                    ...defaultData.settings,
-                    ...(parsedData.settings || {})
-                }
+            const recoveryBackup = {
+                format: "velvet-day-recovery",
+                savedAt: getTimestamp(),
+                reason: "The original Velvet Day data could not be parsed.",
+                rawData: rawData
             };
 
-            // Make sure collection properties are arrays
-            const collectionKeys = [
-                "tasks",
-                "brainDump",
-                "notes",
-                "checklists",
-                "recurringTasks",
-                "reminders",
-                "calendarEvents"
-            ];
+            storage.setItem(
+                RECOVERY_KEY,
+                JSON.stringify(recoveryBackup)
+            );
 
-            collectionKeys.forEach(function (key) {
-                if (!Array.isArray(mergedData[key])) {
-                    mergedData[key] = [];
-                }
-            });
+            console.warn(
+                "Velvet Day: Corrupted data was preserved in a recovery backup."
+            );
 
-            // Ensure activity is an object
-            if (
-                !mergedData.activity ||
-                typeof mergedData.activity !== "object" ||
-                Array.isArray(mergedData.activity)
-            ) {
-                mergedData.activity = {};
-            }
-
-            // Update the version
-            mergedData.version = STORAGE_VERSION;
-
-            // Save the upgraded structure
-            saveData(mergedData);
-
-            return cloneData(mergedData);
-
+            return true;
         } catch (error) {
-            console.error("Velvet Day: Failed to load data.", error);
+            console.error(
+                "Velvet Day: Could not preserve corrupted data.",
+                error
+            );
 
-            // Do not automatically overwrite potentially recoverable
-            // saved data if JSON parsing fails.
-            if (!memoryData) {
-                memoryData = createDefaultData();
-            }
-
-            return cloneData(memoryData);
+            return false;
         }
     }
 
-    // ----------------------------------------------------------
-    // 8. SAVE DATA
-    // ----------------------------------------------------------
-    // Saves the complete app data object.
-    //
-    // Example:
-    // VelvetStorage.saveData(data);
-    // ----------------------------------------------------------
+    function getRecoveryBackup() {
+        const storage = getLocalStorage();
 
-    function saveData(data) {
-        if (!data || typeof data !== "object" || Array.isArray(data)) {
-            console.error("Velvet Day: Invalid data supplied to saveData().");
+        if (!storage) {
+            return null;
+        }
+
+        try {
+            const rawBackup = storage.getItem(RECOVERY_KEY);
+
+            if (!rawBackup) {
+                return null;
+            }
+
+            return safeParse(rawBackup);
+        } catch (error) {
+            console.error(
+                "Velvet Day: Could not read recovery backup.",
+                error
+            );
+
+            return null;
+        }
+    }
+
+    function clearRecoveryBackup() {
+        const storage = getLocalStorage();
+
+        if (!storage) {
             return false;
         }
 
         try {
-            data.version = STORAGE_VERSION;
-
-            const serializedData = JSON.stringify(data);
-
-            if (!isStorageAvailable()) {
-                memoryData = cloneData(data);
-                return false;
-            }
-
-            localStorage.setItem(STORAGE_KEY, serializedData);
-
-            // Keep an in-memory copy as well
-            memoryData = cloneData(data);
-
+            storage.removeItem(RECOVERY_KEY);
             return true;
-
         } catch (error) {
-            console.error("Velvet Day: Failed to save data.", error);
-
-            // Fall back to memory storage
-            memoryData = cloneData(data);
+            console.error(
+                "Velvet Day: Could not remove recovery backup.",
+                error
+            );
 
             return false;
         }
     }
 
-    // ----------------------------------------------------------
-    // 9. UPDATE DATA
-    // ----------------------------------------------------------
-    // Updates specific properties without manually rebuilding
-    // the entire data object.
-    //
-    // Example:
-    // VelvetStorage.updateData({
-    //     tasks: updatedTasks
-    // });
-    // ----------------------------------------------------------
+    // -----------------------------------------------------
+    // Data normalization
+    // -----------------------------------------------------
 
-    function updateData(updates) {
-        if (!updates || typeof updates !== "object" || Array.isArray(updates)) {
-            console.error("Velvet Day: Invalid update object.");
-            return false;
+    function normalizeData(data) {
+        const defaults = createDefaultData();
+
+        if (!isObject(data)) {
+            return defaults;
         }
 
-        const currentData = loadData();
-
-        const updatedData = {
-            ...currentData,
-            ...updates,
-
-            settings: {
-                ...currentData.settings,
-                ...(updates.settings || {})
-            }
+        const normalized = {
+            ...defaults,
+            ...data
         };
 
-        return saveData(updatedData);
-    }
+        const collectionNames = [
+            "tasks",
+            "notes",
+            "checklists",
+            "brainDump",
+            "recurring",
+            "reminders"
+        ];
 
-    // ----------------------------------------------------------
-    // 10. GET A SPECIFIC DATA PROPERTY
-    // ----------------------------------------------------------
-    // Example:
-    // const tasks = VelvetStorage.get("tasks");
-    // ----------------------------------------------------------
+        collectionNames.forEach((collectionName) => {
+            if (!Array.isArray(normalized[collectionName])) {
+                normalized[collectionName] = [];
+            }
+        });
 
-    function get(key) {
-        const data = loadData();
+        normalized.settings = {
+            ...defaults.settings,
+            ...(isObject(data.settings) ? data.settings : {})
+        };
 
-        if (!Object.prototype.hasOwnProperty.call(data, key)) {
-            return undefined;
+        normalized.metadata = {
+            ...defaults.metadata,
+            ...(isObject(data.metadata) ? data.metadata : {})
+        };
+
+        normalized.version = 1;
+
+        if (!normalized.metadata.createdAt) {
+            normalized.metadata.createdAt = getTimestamp();
         }
 
-        return cloneData(data[key]);
+        normalized.metadata.updatedAt = getTimestamp();
+
+        return normalized;
     }
 
-    // ----------------------------------------------------------
-    // 11. SET A SPECIFIC DATA PROPERTY
-    // ----------------------------------------------------------
-    // Example:
-    // VelvetStorage.set("notes", updatedNotes);
-    // ----------------------------------------------------------
+    // -----------------------------------------------------
+    // Read saved data
+    // -----------------------------------------------------
 
-    function set(key, value) {
-        const currentData = loadData();
+    function getRawData() {
+        const storage = getLocalStorage();
 
-        currentData[key] = value;
-
-        return saveData(currentData);
-    }
-
-    // ----------------------------------------------------------
-    // 12. RESET APP DATA
-    // ----------------------------------------------------------
-    // Deletes all saved Velvet Day data and restores defaults.
-    //
-    // IMPORTANT:
-    // This function should only be called when the user
-    // intentionally chooses Reset App Data.
-    // ----------------------------------------------------------
-
-    function resetData() {
-        try {
-            localStorage.removeItem(STORAGE_KEY);
-        } catch (error) {
-            console.warn("Velvet Day: Could not clear local storage.", error);
-        }
-
-        memoryData = createDefaultData();
-
-        saveData(memoryData);
-
-        return cloneData(memoryData);
-    }
-
-    // ----------------------------------------------------------
-    // 13. EXPORT DATA
-    // ----------------------------------------------------------
-    // Returns all app data as JSON.
-    // Later, this can be used to implement a backup feature.
-    // ----------------------------------------------------------
-
-    function exportData() {
-        const data = loadData();
-
-        return JSON.stringify(data, null, 2);
-    }
-
-    // ----------------------------------------------------------
-    // 14. IMPORT DATA
-    // ----------------------------------------------------------
-    // Allows backup data to be restored later.
-    //
-    // Returns true if the data is valid and saved successfully.
-    // ----------------------------------------------------------
-
-    function importData(jsonString) {
-        try {
-            const importedData = JSON.parse(jsonString);
-
-            if (
-                !importedData ||
-                typeof importedData !== "object" ||
-                Array.isArray(importedData)
-            ) {
-                console.error("Velvet Day: Invalid import format.");
-                return false;
+        if (!storage) {
+            if (!memoryFallback) {
+                memoryFallback = createDefaultData();
             }
 
-            // Merge imported data with defaults
-            const restoredData = {
-                ...createDefaultData(),
-                ...importedData,
+            return deepClone(memoryFallback);
+        }
 
-                settings: {
-                    ...defaultData.settings,
-                    ...(importedData.settings || {})
+        let rawData;
+
+        try {
+            rawData = storage.getItem(STORAGE_KEY);
+        } catch (error) {
+            console.error(
+                "Velvet Day: Unable to read local storage.",
+                error
+            );
+
+            if (!memoryFallback) {
+                memoryFallback = createDefaultData();
+            }
+
+            return deepClone(memoryFallback);
+        }
+
+        // First-time application usage.
+        if (rawData === null) {
+            const defaultData = createDefaultData();
+
+            memoryFallback = defaultData;
+
+            try {
+                storage.setItem(
+                    STORAGE_KEY,
+                    JSON.stringify(defaultData)
+                );
+            } catch (error) {
+                console.error(
+                    "Velvet Day: Could not initialize local storage.",
+                    error
+                );
+            }
+
+            return deepClone(defaultData);
+        }
+
+        const parsedData = safeParse(rawData);
+
+        // Preserve corrupted data before returning defaults.
+        if (!isObject(parsedData)) {
+            corruptedDataDetected = true;
+            preserveCorruptedData(rawData);
+
+            if (!memoryFallback) {
+                memoryFallback = createDefaultData();
+            }
+
+            return deepClone(memoryFallback);
+        }
+
+        const normalizedData = normalizeData(parsedData);
+
+        memoryFallback = normalizedData;
+
+        return deepClone(normalizedData);
+    }
+
+    // -----------------------------------------------------
+    // Save data
+    // -----------------------------------------------------
+
+    function saveData(data) {
+        if (!isObject(data)) {
+            console.error(
+                "Velvet Day: Invalid data supplied to saveData()."
+            );
+
+            return false;
+        }
+
+        const normalizedData = normalizeData(data);
+
+        // If corrupted data was detected, make sure it is
+        // preserved before replacing the main storage entry.
+        if (corruptedDataDetected) {
+            const storage = getLocalStorage();
+
+            if (storage) {
+                try {
+                    const existingData = storage.getItem(STORAGE_KEY);
+
+                    if (existingData) {
+                        preserveCorruptedData(existingData);
+                    }
+                } catch (error) {
+                    console.error(
+                        "Velvet Day: Could not verify recovery backup.",
+                        error
+                    );
+
+                    return false;
                 }
-            };
+            }
+        }
 
-            // Validate collection properties
-            const collectionKeys = [
-                "tasks",
-                "brainDump",
-                "notes",
-                "checklists",
-                "recurringTasks",
-                "reminders",
-                "calendarEvents"
-            ];
+        const serializedData = JSON.stringify(normalizedData);
 
-            collectionKeys.forEach(function (key) {
-                if (!Array.isArray(restoredData[key])) {
-                    restoredData[key] = [];
-                }
+        const storage = getLocalStorage();
+
+        // Keep the latest data in memory even if persistent
+        // storage is unavailable.
+        memoryFallback = normalizedData;
+
+        if (!storage) {
+            console.warn(
+                "Velvet Day: Changes are only stored in memory because local storage is unavailable."
+            );
+
+            return false;
+        }
+
+        try {
+            storage.setItem(STORAGE_KEY, serializedData);
+
+            corruptedDataDetected = false;
+
+            dispatchStorageEvent({
+                type: "save",
+                data: deepClone(normalizedData)
             });
 
-            return saveData(restoredData);
-
+            return true;
         } catch (error) {
-            console.error("Velvet Day: Import failed.", error);
+            console.error(
+                "Velvet Day: Unable to save data.",
+                error
+            );
+
             return false;
         }
     }
 
-    // ----------------------------------------------------------
-    // 15. PUBLIC API
-    // ----------------------------------------------------------
-    // Other JavaScript files can access these functions using:
-    //
-    // VelvetStorage.loadData()
-    // VelvetStorage.saveData(data)
-    // VelvetStorage.get("tasks")
-    // VelvetStorage.set("tasks", tasks)
-    // VelvetStorage.updateData({ notes: notes })
-    // ----------------------------------------------------------
+    // -----------------------------------------------------
+    // Get complete data
+    // -----------------------------------------------------
 
-    window.VelvetStorage = {
-        loadData,
-        saveData,
-        updateData,
+    function getAll() {
+        return getRawData();
+    }
+
+    // -----------------------------------------------------
+    // Get a value
+    // Supports nested keys, for example:
+    // get("settings.theme")
+    // -----------------------------------------------------
+
+    function get(key, fallback = null) {
+        if (!key || typeof key !== "string") {
+            return fallback;
+        }
+
+        const data = getRawData();
+
+        const keys = key.split(".");
+        let value = data;
+
+        for (const part of keys) {
+            if (
+                value === null ||
+                value === undefined ||
+                !Object.prototype.hasOwnProperty.call(value, part)
+            ) {
+                return fallback;
+            }
+
+            value = value[part];
+        }
+
+        return value === undefined ? fallback : value;
+    }
+
+    // -----------------------------------------------------
+    // Set a value
+    // Supports nested keys, for example:
+    // set("settings.theme", "light")
+    // -----------------------------------------------------
+
+    function set(key, value) {
+        if (!key || typeof key !== "string") {
+            console.error("Velvet Day: Invalid storage key.");
+            return false;
+        }
+
+        const data = getRawData();
+        const keys = key.split(".");
+        let current = data;
+
+        for (let index = 0; index < keys.length - 1; index++) {
+            const part = keys[index];
+
+            if (!isObject(current[part])) {
+                current[part] = {};
+            }
+
+            current = current[part];
+        }
+
+        current[keys[keys.length - 1]] = value;
+
+        return saveData(data);
+    }
+
+    // -----------------------------------------------------
+    // Remove a value
+    // -----------------------------------------------------
+
+    function remove(key) {
+        if (!key || typeof key !== "string") {
+            return false;
+        }
+
+        const data = getRawData();
+        const keys = key.split(".");
+        let current = data;
+
+        for (let index = 0; index < keys.length - 1; index++) {
+            const part = keys[index];
+
+            if (!isObject(current[part])) {
+                return false;
+            }
+
+            current = current[part];
+        }
+
+        const finalKey = keys[keys.length - 1];
+
+        if (!Object.prototype.hasOwnProperty.call(current, finalKey)) {
+            return false;
+        }
+
+        delete current[finalKey];
+
+        return saveData(data);
+    }
+
+    // -----------------------------------------------------
+    // Clear application data
+    // Does not remove unrelated localStorage entries.
+    // -----------------------------------------------------
+
+    function clear() {
+        const storage = getLocalStorage();
+
+        if (!storage) {
+            memoryFallback = createDefaultData();
+            return false;
+        }
+
+        try {
+            storage.removeItem(STORAGE_KEY);
+
+            memoryFallback = createDefaultData();
+            corruptedDataDetected = false;
+
+            // Keep the recovery backup intact.
+            saveData(memoryFallback);
+
+            dispatchStorageEvent({
+                type: "clear",
+                data: getAll()
+            });
+
+            return true;
+        } catch (error) {
+            console.error(
+                "Velvet Day: Unable to clear application data.",
+                error
+            );
+
+            return false;
+        }
+    }
+
+    // -----------------------------------------------------
+    // Export data
+    // Downloads a JSON backup.
+    // -----------------------------------------------------
+
+    function exportData() {
+        const data = getAll();
+
+        const backup = {
+            format: BACKUP_FORMAT,
+            backupVersion: BACKUP_VERSION,
+            exportedAt: getTimestamp(),
+            data: data
+        };
+
+        const json = JSON.stringify(backup, null, 2);
+
+        const blob = new Blob(
+            [json],
+            { type: "application/json" }
+        );
+
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = `velvet-day-backup-${new Date()
+            .toISOString()
+            .slice(0, 10)}.json`;
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        URL.revokeObjectURL(url);
+
+        return json;
+    }
+
+    // -----------------------------------------------------
+    // Validate imported backup
+    // -----------------------------------------------------
+
+    function validateImportData(importedData) {
+        if (!isObject(importedData)) {
+            throw new Error("Invalid backup file.");
+        }
+
+        let data = importedData;
+
+        // Support the current backup envelope.
+        if (importedData.format === BACKUP_FORMAT) {
+            if (!isObject(importedData.data)) {
+                throw new Error("Backup data is missing or invalid.");
+            }
+
+            data = importedData.data;
+        }
+
+        // Also support importing a plain Velvet Day data object.
+        const requiredCollections = [
+            "tasks",
+            "notes",
+            "checklists",
+            "brainDump"
+        ];
+
+        for (const collectionName of requiredCollections) {
+            if (!Array.isArray(data[collectionName])) {
+                throw new Error(
+                    `Invalid backup: ${collectionName} must be an array.`
+                );
+            }
+        }
+
+        const optionalCollections = [
+            "recurring",
+            "reminders"
+        ];
+
+        for (const collectionName of optionalCollections) {
+            if (
+                data[collectionName] !== undefined &&
+                !Array.isArray(data[collectionName])
+            ) {
+                throw new Error(
+                    `Invalid backup: ${collectionName} must be an array.`
+                );
+            }
+        }
+
+        return normalizeData(data);
+    }
+
+    // -----------------------------------------------------
+    // Import backup
+    // Accepts a File object or JSON string.
+    // -----------------------------------------------------
+
+    async function importData(file) {
+        try {
+            if (!file) {
+                throw new Error("No backup file selected.");
+            }
+
+            let content;
+
+            if (typeof file === "string") {
+                content = file;
+            } else if (typeof file.text === "function") {
+                content = await file.text();
+            } else {
+                throw new Error("Unsupported backup file.");
+            }
+
+            const parsedData = safeParse(content);
+
+            if (!parsedData) {
+                throw new Error("The backup file contains invalid JSON.");
+            }
+
+            const validatedData = validateImportData(parsedData);
+
+            const wasSaved = saveData(validatedData);
+
+            if (!wasSaved) {
+                throw new Error(
+                    "The backup could not be saved to local storage."
+                );
+            }
+
+            dispatchStorageEvent({
+                type: "import",
+                data: deepClone(validatedData)
+            });
+
+            return {
+                success: true,
+                message: "Backup imported successfully.",
+                data: deepClone(validatedData)
+            };
+        } catch (error) {
+            console.error(
+                "Velvet Day: Import failed.",
+                error
+            );
+
+            return {
+                success: false,
+                message: error.message || "Unable to import backup."
+            };
+        }
+    }
+
+    // -----------------------------------------------------
+    // Storage change event
+    // -----------------------------------------------------
+
+    function dispatchStorageEvent(detail = {}) {
+        const event = new CustomEvent("velvet:storage-updated", {
+            detail
+        });
+
+        window.dispatchEvent(event);
+    }
+
+    // -----------------------------------------------------
+    // Collection helpers
+    // -----------------------------------------------------
+
+    function getCollection(collectionName) {
+        const collection = get(collectionName, []);
+
+        return Array.isArray(collection) ? collection : [];
+    }
+
+    function setCollection(collectionName, items) {
+        if (!Array.isArray(items)) {
+            console.error(
+                `Velvet Day: ${collectionName} must be an array.`
+            );
+
+            return false;
+        }
+
+        return set(collectionName, items);
+    }
+
+    function addToCollection(collectionName, item) {
+        if (!isObject(item)) {
+            console.error("Velvet Day: Invalid collection item.");
+            return false;
+        }
+
+        const collection = getCollection(collectionName);
+
+        const newItem = {
+            ...item,
+            id: item.id || generateId()
+        };
+
+        if (!newItem.createdAt) {
+            newItem.createdAt = getTimestamp();
+        }
+
+        newItem.updatedAt = getTimestamp();
+
+        collection.push(newItem);
+
+        const wasSaved = setCollection(collectionName, collection);
+
+        return wasSaved ? newItem : false;
+    }
+
+    function updateInCollection(collectionName, itemId, updates) {
+        if (!itemId) {
+            return false;
+        }
+
+        const collection = getCollection(collectionName);
+
+        const itemIndex = collection.findIndex(
+            (item) => String(item.id) === String(itemId)
+        );
+
+        if (itemIndex === -1) {
+            return false;
+        }
+
+        const existingItem = collection[itemIndex];
+
+        let updatedItem;
+
+        if (typeof updates === "function") {
+            updatedItem = updates(deepClone(existingItem));
+        } else if (isObject(updates)) {
+            updatedItem = {
+                ...existingItem,
+                ...updates
+            };
+        } else {
+            return false;
+        }
+
+        if (!isObject(updatedItem)) {
+            return false;
+        }
+
+        collection[itemIndex] = {
+            ...updatedItem,
+            id: existingItem.id,
+            updatedAt: getTimestamp()
+        };
+
+        const wasSaved = setCollection(collectionName, collection);
+
+        return wasSaved ? collection[itemIndex] : false;
+    }
+
+    function deleteFromCollection(collectionName, itemId) {
+        if (!itemId) {
+            return false;
+        }
+
+        const collection = getCollection(collectionName);
+
+        const updatedCollection = collection.filter(
+            (item) => String(item.id) !== String(itemId)
+        );
+
+        if (updatedCollection.length === collection.length) {
+            return false;
+        }
+
+        return setCollection(collectionName, updatedCollection);
+    }
+
+    // -----------------------------------------------------
+    // Storage information
+    // -----------------------------------------------------
+
+    function getStorageInfo() {
+        const storage = getLocalStorage();
+
+        let usedBytes = 0;
+
+        if (storage) {
+            try {
+                const savedData = storage.getItem(STORAGE_KEY);
+
+                if (savedData) {
+                    usedBytes = new Blob([savedData]).size;
+                }
+            } catch (error) {
+                console.error(
+                    "Velvet Day: Could not calculate storage usage.",
+                    error
+                );
+            }
+        }
+
+        return {
+            available: isStorageAvailable(),
+            usedBytes,
+            usedKB: Number((usedBytes / 1024).toFixed(2)),
+            hasRecoveryBackup: Boolean(getRecoveryBackup())
+        };
+    }
+
+    // -----------------------------------------------------
+    // Public API
+    // -----------------------------------------------------
+
+    return {
+        // General storage
+        isStorageAvailable,
+        getAll,
         get,
         set,
-        resetData,
+        remove,
+        saveData,
+        clear,
+
+        // Backup and restore
         exportData,
-        importData
+        importData,
+
+        // Recovery
+        getRecoveryBackup,
+        clearRecoveryBackup,
+
+        // Collection operations
+        getCollection,
+        setCollection,
+        addToCollection,
+        updateInCollection,
+        deleteFromCollection,
+
+        // Storage information
+        getStorageInfo,
+
+        // Events
+        dispatchStorageEvent
     };
-
-    // ----------------------------------------------------------
-    // 16. INITIALIZE STORAGE
-    // ----------------------------------------------------------
-    // Load or create the data structure when the script is loaded.
-    // ----------------------------------------------------------
-
-    loadData();
-
-    console.log("💜 Velvet Day storage initialized.");
-
 })();
