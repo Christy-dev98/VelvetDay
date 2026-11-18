@@ -384,95 +384,17 @@
     // elements are created dynamically later.
     // ----------------------------------------------------------
 
-    function setupEventListeners() {
+    // Navigation clicks
+document.addEventListener("click", function (event) {
+    const navButton = event.target.closest("[data-page]");
 
-        // Navigation clicks
-        document.addEventListener("click", function (event) {
-            const navButton = event.target.closest("[data-page]");
+    if (navButton) {
+        event.preventDefault();
 
-            if (navButton) {
-                event.preventDefault();
+        navigate(navButton.dataset.page);
 
-                navigate(navButton.dataset.page);
-
-                return;
-            }
-
-            // Theme toggle
-            const themeButton = event.target.closest(
-                "[data-theme-toggle]"
-            );
-
-            if (themeButton) {
-                event.preventDefault();
-
-                toggleTheme();
-
-                return;
-            }
-
-            // Mobile sidebar toggle
-            const sidebarButton = event.target.closest(
-                "[data-sidebar-toggle]"
-            );
-
-            if (sidebarButton) {
-                event.preventDefault();
-
-                toggleMobileSidebar();
-
-                return;
-            }
-
-            // Close sidebar when clicking overlay
-            const overlay = event.target.closest("#sidebarOverlay");
-
-            if (overlay) {
-                closeMobileSidebar();
-            }
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener("keydown", function (event) {
-
-            // Escape closes sidebar
-            if (event.key === "Escape") {
-                closeMobileSidebar();
-            }
-
-            // Ctrl + / or Cmd + / focuses the search box
-            if (
-                (event.ctrlKey || event.metaKey) &&
-                event.key === "/"
-            ) {
-                event.preventDefault();
-
-                const searchInput = getElement(
-                    "[data-search-input]"
-                );
-
-                if (searchInput) {
-                    searchInput.focus();
-                }
-            }
-        });
-
-        // Listen for storage changes from other browser tabs
-        window.addEventListener("storage", function (event) {
-            if (event.key === "velvetDayData") {
-                state.data = loadAppData();
-
-                document.dispatchEvent(
-                    new CustomEvent("velvet:data-reloaded", {
-                        detail: {
-                            data: state.data
-                        }
-                    })
-                );
-            }
-        });
+        return;
     }
-
     // ----------------------------------------------------------
     // 15. INITIALIZE THE THEME
     // ----------------------------------------------------------
