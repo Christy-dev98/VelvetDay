@@ -1,75 +1,35 @@
+/* ==========================================================
+   VELVET DAY - ANIMATIONS & MICRO-INTERACTIONS
+   File: css/animations.css
 
-/* =========================================================
-   VELVET DAY ♡
-   ANIMATIONS & MICRO-INTERACTIONS
-
-   Theme:
-   - Cozy
-   - Dark feminine
-   - Pinterest-inspired
-   - Soft lavender
-   - Dreamy but minimal
-
-   This file contains ONLY animations and transitions.
-========================================================= */
+   Soft, elegant animations.
+   Works with style.css and responsive.css.
+   ========================================================== */
 
 
-/* =========================================================
-   1. ANIMATION SETTINGS
-========================================================= */
+/* ----------------------------------------------------------
+   1. ANIMATION VARIABLES
+---------------------------------------------------------- */
 
 :root {
-    --animation-fast: 0.18s ease;
-    --animation-medium: 0.3s ease;
-    --animation-smooth: 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    --animation-fast: 180ms ease;
+    --animation-medium: 300ms ease;
+    --animation-smooth: 450ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 
-/* =========================================================
-   2. PAGE ENTRANCE
-========================================================= */
+/* ----------------------------------------------------------
+   2. PAGE TRANSITIONS
+---------------------------------------------------------- */
 
-/*
-   When the app first loads, fade the page in softly.
-*/
-
-.main-content {
-    animation: pageFadeIn 0.5s ease both;
+.page-section.active {
+    animation: velvetPageEnter 280ms ease both;
 }
 
-@keyframes pageFadeIn {
+@keyframes velvetPageEnter {
     from {
         opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-
-/* =========================================================
-   3. CARD ENTRANCE ANIMATION
-========================================================= */
-
-/*
-   Dashboard cards enter with a slight upward movement.
-
-   The animation is intentionally subtle.
-*/
-
-.dashboard-card,
-.stat-card,
-.note-card,
-.checklist-card,
-.template-card {
-    animation: cardEntrance 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@keyframes cardEntrance {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
+        transform: translateY(5px);
     }
 
     to {
@@ -79,102 +39,96 @@
 }
 
 
-/* =========================================================
-   4. STAGGERED CARD ANIMATION
-========================================================= */
+/* ----------------------------------------------------------
+   3. DASHBOARD CARD ENTRANCE
+---------------------------------------------------------- */
 
-/*
-   Cards do not appear at exactly the same time.
-
-   This creates a natural Pinterest-style effect.
-*/
-
-.dashboard-grid > *:nth-child(1) {
-    animation-delay: 0.05s;
+.content-card,
+.stat-card,
+.dashboard-card,
+.note-card,
+.checklist-card,
+.recurring-card,
+.reminder-card,
+.brain-dump-card {
+    animation: velvetCardEnter 380ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
-.dashboard-grid > *:nth-child(2) {
-    animation-delay: 0.1s;
-}
+@keyframes velvetCardEnter {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
 
-.dashboard-grid > *:nth-child(3) {
-    animation-delay: 0.15s;
-}
-
-.dashboard-grid > *:nth-child(4) {
-    animation-delay: 0.2s;
-}
-
-.dashboard-grid > *:nth-child(5) {
-    animation-delay: 0.25s;
-}
-
-.dashboard-grid > *:nth-child(6) {
-    animation-delay: 0.3s;
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 
-/* =========================================================
-   5. CARD HOVER EFFECT
-========================================================= */
+/* ----------------------------------------------------------
+   4. STAGGERED DASHBOARD ANIMATION
+---------------------------------------------------------- */
 
-/*
-   Cards gently lift when the user moves the mouse over them.
+.dashboard-grid > :nth-child(1) {
+    animation-delay: 50ms;
+}
 
-   On touch devices, hover effects are not important.
-*/
+.dashboard-grid > :nth-child(2) {
+    animation-delay: 100ms;
+}
 
-@media (hover: hover) {
+.dashboard-grid > :nth-child(3) {
+    animation-delay: 150ms;
+}
 
-    .dashboard-card,
+.dashboard-grid > :nth-child(4) {
+    animation-delay: 200ms;
+}
+
+
+/* ----------------------------------------------------------
+   5. CARD HOVER EFFECTS
+---------------------------------------------------------- */
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+
+    .content-card,
     .stat-card,
     .note-card,
     .checklist-card,
-    .template-card {
+    .recurring-card,
+    .reminder-card {
         transition:
             transform var(--animation-medium),
             border-color var(--animation-medium),
             box-shadow var(--animation-medium);
     }
 
-    .dashboard-card:hover {
-        transform: translateY(-4px);
-        border-color: rgba(197, 160, 231, 0.25);
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+    .content-card:hover,
+    .note-card:hover {
+        transform: translateY(-3px);
     }
 
     .stat-card:hover {
         transform: translateY(-3px);
     }
 
-    .note-card:hover {
-        transform: translateY(-4px) rotate(-0.5deg);
-    }
-
     .checklist-card:hover {
-        transform: translateY(-3px);
+        transform: translateY(-2px);
     }
 
-    .template-card:hover {
-        transform: translateY(-4px);
+    .recurring-card:hover,
+    .reminder-card:hover {
+        transform: translateY(-2px);
     }
-
 }
 
 
-/* =========================================================
+/* ----------------------------------------------------------
    6. BUTTON INTERACTIONS
-========================================================= */
-
-/*
-   Buttons should feel responsive.
-
-   Hover:
-   Slightly brighter.
-
-   Click:
-   Slightly smaller.
-*/
+---------------------------------------------------------- */
 
 button,
 .primary-button,
@@ -183,9 +137,9 @@ button,
     transition:
         background-color var(--animation-fast),
         color var(--animation-fast),
-        transform var(--animation-fast),
         border-color var(--animation-fast),
-        box-shadow var(--animation-fast);
+        box-shadow var(--animation-fast),
+        transform var(--animation-fast);
 }
 
 button:active,
@@ -195,117 +149,58 @@ button:active,
     transform: scale(0.97);
 }
 
-
-/* Primary button glow */
-
 .primary-button:hover {
-    box-shadow: 0 0 18px rgba(174, 135, 213, 0.16);
+    box-shadow: 0 0 16px rgba(185, 155, 214, 0.18);
 }
-
-
-/* Icon button */
 
 .icon-button:hover {
-    transform: scale(1.05);
+    transform: scale(1.04);
 }
 
 
-/* =========================================================
-   7. CHECKBOX ANIMATION
-========================================================= */
-
-/*
-   Completing a task should feel satisfying.
-
-   The checkbox gently grows when selected.
-*/
-
-.task-checkbox {
-    transition:
-        transform var(--animation-fast),
-        background-color var(--animation-fast),
-        border-color var(--animation-fast);
-}
-
-.task-checkbox:checked {
-    animation: checkboxPop 0.25s ease;
-}
-
-@keyframes checkboxPop {
-    0% {
-        transform: scale(0.8);
-    }
-
-    55% {
-        transform: scale(1.15);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-
-/* =========================================================
-   8. TASK COMPLETION
-========================================================= */
-
-/*
-   Completed tasks become softer and calmer.
-
-   This makes pending tasks easier to notice.
-*/
+/* ----------------------------------------------------------
+   7. TASK COMPLETION
+---------------------------------------------------------- */
 
 .task-item {
     transition:
         opacity var(--animation-medium),
         background-color var(--animation-medium),
-        transform var(--animation-fast);
+        border-color var(--animation-medium);
 }
 
 .task-item.completed {
-    opacity: 0.65;
+    opacity: 0.68;
 }
 
 .task-item.completed .task-title {
     text-decoration: line-through;
-    text-decoration-color: rgba(200, 170, 220, 0.7);
-    transition: text-decoration var(--animation-medium);
+    text-decoration-color: var(--accent-purple);
 }
 
-
-/* =========================================================
-   9. PROGRESS BAR
-========================================================= */
-
-.progress-bar-fill,
-.progress-fill {
-    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-
-/* =========================================================
-   10. CALENDAR INTERACTIONS
-========================================================= */
-
-.calendar-day {
+.task-checkbox {
     transition:
         background-color var(--animation-fast),
         border-color var(--animation-fast),
+        color var(--animation-fast),
         transform var(--animation-fast);
 }
 
-.calendar-day:hover {
-    transform: scale(1.025);
+.task-checkbox:active {
+    transform: scale(0.88);
 }
 
-.calendar-day.selected {
-    animation: calendarSelect 0.25s ease;
+.task-item.completed .task-checkbox {
+    animation: velvetCheckboxPop 250ms ease;
 }
 
-@keyframes calendarSelect {
+@keyframes velvetCheckboxPop {
     0% {
-        transform: scale(0.95);
+        transform: scale(0.8);
+    }
+
+    55% {
+        transform: scale(1.16);
     }
 
     100% {
@@ -314,82 +209,152 @@ button:active,
 }
 
 
-/* =========================================================
-   11. SIDEBAR NAVIGATION
-========================================================= */
+/* ----------------------------------------------------------
+   8. TASK AND LIST ITEM ENTRANCE
+---------------------------------------------------------- */
 
-.nav-item {
-    transition:
-        background-color var(--animation-fast),
-        color var(--animation-fast),
-        transform var(--animation-fast);
+.task-item,
+.brain-dump-card,
+.checklist-item,
+.calendar-task-item {
+    animation: velvetListEnter 280ms ease backwards;
 }
 
-.nav-item:hover {
-    transform: translateX(3px);
-}
-
-.nav-item.active {
-    animation: navActive 0.25s ease;
-}
-
-@keyframes navActive {
+@keyframes velvetListEnter {
     from {
-        opacity: 0.75;
+        opacity: 0;
+        transform: translateY(5px);
     }
 
     to {
         opacity: 1;
+        transform: translateY(0);
     }
 }
 
 
-/* =========================================================
-   12. MOBILE NAVIGATION
-========================================================= */
+/* ----------------------------------------------------------
+   9. PROGRESS ANIMATIONS
+---------------------------------------------------------- */
 
-.mobile-nav-item {
+.progress-bar-fill,
+.progress-fill {
+    transition: width 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.progress-circle {
+    transition: background 600ms ease;
+}
+
+.progress-circle-inner strong {
+    transition: color var(--animation-medium);
+}
+
+
+/* ----------------------------------------------------------
+   10. CALENDAR INTERACTIONS
+---------------------------------------------------------- */
+
+.calendar-day {
     transition:
+        background-color var(--animation-fast),
+        border-color var(--animation-fast),
         color var(--animation-fast),
         transform var(--animation-fast);
 }
 
-.mobile-nav-item:active {
-    transform: scale(0.92);
+@media (hover: hover) {
+    .calendar-day:hover {
+        transform: scale(1.035);
+    }
 }
 
-.mobile-nav-item.active svg {
-    animation: iconBounce 0.35s ease;
+.calendar-day.selected {
+    animation: velvetCalendarSelect 220ms ease;
 }
 
-@keyframes iconBounce {
+.calendar-day.today {
+    transition: border-color var(--animation-fast);
+}
+
+@keyframes velvetCalendarSelect {
     0% {
-        transform: translateY(0);
+        transform: scale(0.94);
     }
 
-    40% {
-        transform: translateY(-3px);
+    65% {
+        transform: scale(1.04);
     }
 
     100% {
-        transform: translateY(0);
+        transform: scale(1);
     }
 }
 
 
-/* =========================================================
-   13. MODAL ANIMATION
-========================================================= */
+/* ----------------------------------------------------------
+   11. SIDEBAR NAVIGATION
+---------------------------------------------------------- */
 
-.modal-overlay {
-    animation: overlayFadeIn 0.2s ease;
+.nav-link {
+    transition:
+        background-color var(--animation-fast),
+        color var(--animation-fast),
+        border-color var(--animation-fast),
+        transform var(--animation-fast);
 }
 
-.modal {
-    animation: modalEntrance 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+@media (hover: hover) {
+    .nav-link:hover {
+        transform: translateX(2px);
+    }
 }
 
-@keyframes overlayFadeIn {
+.nav-link.active {
+    animation: velvetNavigationActive 220ms ease;
+}
+
+@keyframes velvetNavigationActive {
+    from {
+        opacity: 0.7;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+/* ----------------------------------------------------------
+   12. MOBILE SIDEBAR
+---------------------------------------------------------- */
+
+.sidebar {
+    transition:
+        transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 280ms ease;
+}
+
+.sidebar-overlay {
+    transition:
+        opacity 250ms ease,
+        visibility 250ms ease;
+}
+
+
+/* ----------------------------------------------------------
+   13. MODAL ANIMATIONS
+---------------------------------------------------------- */
+
+.modal-overlay.active {
+    animation: velvetOverlayEnter 200ms ease;
+}
+
+.modal.active {
+    animation: velvetModalEnter 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes velvetOverlayEnter {
     from {
         opacity: 0;
     }
@@ -399,10 +364,10 @@ button:active,
     }
 }
 
-@keyframes modalEntrance {
+@keyframes velvetModalEnter {
     from {
         opacity: 0;
-        transform: translateY(18px) scale(0.97);
+        transform: translateY(14px) scale(0.97);
     }
 
     to {
@@ -412,18 +377,22 @@ button:active,
 }
 
 
-/* =========================================================
-   14. TOAST NOTIFICATION ANIMATION
-========================================================= */
+/* ----------------------------------------------------------
+   14. TOAST NOTIFICATIONS
+---------------------------------------------------------- */
 
 .toast {
-    animation: toastEntrance 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: velvetToastEnter 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@keyframes toastEntrance {
+.toast.toast-exit {
+    animation: velvetToastExit 220ms ease forwards;
+}
+
+@keyframes velvetToastEnter {
     from {
         opacity: 0;
-        transform: translateX(20px);
+        transform: translateX(18px);
     }
 
     to {
@@ -432,78 +401,77 @@ button:active,
     }
 }
 
+@keyframes velvetToastExit {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
 
-/* =========================================================
-   15. FLOATING DECORATIONS
-========================================================= */
-
-/*
-   Decorative elements such as:
-   - Hearts
-   - Stars
-   - Flowers
-   - Sparkles
-
-   Add the class .float-decoration to decorative elements.
-*/
-
-.float-decoration {
-    animation: floatSlow 4s ease-in-out infinite;
+    to {
+        opacity: 0;
+        transform: translateX(18px);
+    }
 }
 
-@keyframes floatSlow {
-    0% {
+
+/* ----------------------------------------------------------
+   15. FLOATING DECORATIONS
+---------------------------------------------------------- */
+
+.float-decoration {
+    animation: velvetFloat 4s ease-in-out infinite;
+}
+
+@keyframes velvetFloat {
+    0%,
+    100% {
         transform: translateY(0);
     }
 
     50% {
-        transform: translateY(-7px);
-    }
-
-    100% {
-        transform: translateY(0);
+        transform: translateY(-6px);
     }
 }
 
 
-/* =========================================================
-   16. SPARKLE ANIMATION
-========================================================= */
+/* ----------------------------------------------------------
+   16. SPARKLE EFFECT
+---------------------------------------------------------- */
 
 .sparkle {
-    animation: sparkle 2.5s ease-in-out infinite;
+    animation: velvetSparkle 2.5s ease-in-out infinite;
 }
 
-@keyframes sparkle {
+@keyframes velvetSparkle {
     0%,
     100% {
-        opacity: 0.35;
-        transform: scale(0.8) rotate(0deg);
+        opacity: 0.4;
+        transform: scale(0.85) rotate(0deg);
     }
 
     50% {
         opacity: 1;
-        transform: scale(1.15) rotate(15deg);
+        transform: scale(1.12) rotate(15deg);
     }
 }
 
 
-/* =========================================================
-   17. HEART BEAT
-========================================================= */
+/* ----------------------------------------------------------
+   17. HEART DECORATION
+---------------------------------------------------------- */
 
 .heart-decoration {
-    animation: heartBeat 2.5s ease-in-out infinite;
+    animation: velvetHeartbeat 2.8s ease-in-out infinite;
 }
 
-@keyframes heartBeat {
+@keyframes velvetHeartbeat {
     0%,
     100% {
         transform: scale(1);
     }
 
     15% {
-        transform: scale(1.12);
+        transform: scale(1.1);
     }
 
     30% {
@@ -511,20 +479,20 @@ button:active,
     }
 
     45% {
-        transform: scale(1.08);
+        transform: scale(1.06);
     }
 }
 
 
-/* =========================================================
-   18. LOADING ANIMATION
-========================================================= */
+/* ----------------------------------------------------------
+   18. LOADING SPINNER
+---------------------------------------------------------- */
 
 .loading-spinner {
-    animation: spin 0.8s linear infinite;
+    animation: velvetSpin 800ms linear infinite;
 }
 
-@keyframes spin {
+@keyframes velvetSpin {
     from {
         transform: rotate(0deg);
     }
@@ -535,32 +503,65 @@ button:active,
 }
 
 
-/* =========================================================
-   19. EMPTY STATE
-========================================================= */
+/* ----------------------------------------------------------
+   19. EMPTY STATE DECORATION
+---------------------------------------------------------- */
 
 .empty-state-icon {
-    animation: emptyStateFloat 3.5s ease-in-out infinite;
+    animation: velvetEmptyFloat 3.5s ease-in-out infinite;
 }
 
-@keyframes emptyStateFloat {
-    0% {
-        transform: translateY(0) rotate(0deg);
+@keyframes velvetEmptyFloat {
+    0%,
+    100% {
+        transform: translateY(0);
     }
 
     50% {
-        transform: translateY(-6px) rotate(3deg);
-    }
-
-    100% {
-        transform: translateY(0) rotate(0deg);
+        transform: translateY(-5px);
     }
 }
 
 
-/* =========================================================
-   20. INPUT FOCUS EFFECT
-========================================================= */
+/* ----------------------------------------------------------
+   20. SEARCH OVERLAY
+---------------------------------------------------------- */
+
+.search-dialog {
+    animation: velvetSearchEnter 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes velvetSearchEnter {
+    from {
+        opacity: 0;
+        transform: translateY(-9px) scale(0.99);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* ----------------------------------------------------------
+   21. PROFILE AVATAR
+---------------------------------------------------------- */
+
+.profile-avatar {
+    transition: transform var(--animation-medium);
+}
+
+@media (hover: hover) {
+    .profile-avatar:hover {
+        transform: rotate(-5deg) scale(1.06);
+    }
+}
+
+
+/* ----------------------------------------------------------
+   22. INPUT FOCUS
+---------------------------------------------------------- */
 
 input,
 textarea,
@@ -571,89 +572,44 @@ select {
         background-color var(--animation-fast);
 }
 
-input:focus,
-textarea:focus,
-select:focus {
-    box-shadow: 0 0 0 3px rgba(180, 145, 213, 0.08);
-}
 
-
-/* =========================================================
-   21. BADGES
-========================================================= */
+/* ----------------------------------------------------------
+   23. BADGE INTERACTIONS
+---------------------------------------------------------- */
 
 .badge,
 .task-tag,
 .priority-badge {
     transition:
-        transform var(--animation-fast),
-        filter var(--animation-fast);
+        filter var(--animation-fast),
+        transform var(--animation-fast);
 }
 
-.badge:hover,
-.task-tag:hover,
-.priority-badge:hover {
-    filter: brightness(1.12);
-}
-
-
-/* =========================================================
-   22. AVATAR
-========================================================= */
-
-.profile-avatar {
-    transition: transform var(--animation-medium);
-}
-
-.profile-avatar:hover {
-    transform: rotate(-5deg) scale(1.06);
+@media (hover: hover) {
+    .badge:hover,
+    .task-tag:hover,
+    .priority-badge:hover {
+        filter: brightness(1.12);
+    }
 }
 
 
-/* =========================================================
-   23. BUTTON RIPPLE-LIKE FEEDBACK
-========================================================= */
-
-/*
-   A simple visual press effect.
-
-   This does not require JavaScript.
-*/
-
-.primary-button:active,
-.secondary-button:active {
-    box-shadow: none;
-}
-
-
-/* =========================================================
-   24. REDUCED MOTION ACCESSIBILITY
-========================================================= */
-
-/*
-   If the user has enabled Reduce Motion in their device
-   settings, animations become almost instant.
-
-   This improves accessibility and prevents unnecessary motion.
-*/
+/* ----------------------------------------------------------
+   24. ACCESSIBILITY
+---------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-
     *,
     *::before,
     *::after {
-
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
-
         transition-duration: 0.01ms !important;
-
         scroll-behavior: auto !important;
     }
-
 }
 
 
-/* =========================================================
-   END OF ANIMATIONS
-========================================================= */
+/* ==========================================================
+   END OF VELVET DAY ANIMATIONS
+========================================================== */
