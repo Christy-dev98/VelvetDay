@@ -29,6 +29,10 @@
 
     <title>Velvet Day | Your Personal Planner</title>
 
+    <!-- Browser and device icons -->
+    <link rel="icon" href="./favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
+
     <!-- PWA manifest -->
     <link rel="manifest" href="./manifest.json">
 
@@ -1608,23 +1612,28 @@
 
     <!-- =====================================================
          JAVASCRIPT FILES
-         Keep this order because the application modules
-         depend on earlier files.
+         All scripts use defer, so they execute in this exact
+         order after the HTML has been parsed.
+
+         Load dependencies first, then the application shell,
+         then feature modules, and finally the initializer.
     ====================================================== -->
 
-    <!-- Core utilities and storage -->
-
+    <!-- 1. Core utilities and persistent storage -->
     <script src="./js/utils.js" defer></script>
     <script src="./js/storage.js" defer></script>
 
-    <!-- Shared UI functionality -->
-
+    <!-- 2. Shared UI modules -->
     <script src="./js/toast.js" defer></script>
     <script src="./js/theme.js" defer></script>
     <script src="./js/navigation.js" defer></script>
 
-    <!-- Feature modules -->
+    <!-- 3. Main application shell -->
+    <!-- app.js must load before feature modules so its state and
+         public API exist before those modules initialize. -->
+    <script src="./js/app.js" defer></script>
 
+    <!-- 4. Feature modules -->
     <script src="./js/tasks.js" defer></script>
     <script src="./js/brain-dump.js" defer></script>
     <script src="./js/notes.js" defer></script>
@@ -1633,16 +1642,16 @@
     <script src="./js/recurring.js" defer></script>
     <script src="./js/reminders.js" defer></script>
     <script src="./js/progress.js" defer></script>
-
-    <!-- Application settings and utilities -->
-
     <script src="./js/settings.js" defer></script>
+
+    <!-- 5. Search and PWA modules are initialized by init.js -->
     <script src="./js/search.js" defer></script>
     <script src="./js/pwa.js" defer></script>
 
-    <!-- Application entry points -->
-
-    <script src="./js/app.js" defer></script>
+    <!-- 6. Final application initializer -->
+    <!-- Feature modules have initialization guards, so this central
+         initializer can safely initialize Search and PWA and confirm
+         that the other modules are ready. -->
     <script src="./js/init.js" defer></script>
 
 </body>
