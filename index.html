@@ -1,241 +1,210 @@
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <!-- ==========================================
-         BASIC PAGE SETTINGS
-         ========================================== -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Velvet Day ♡</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <meta name="description" content="Your cozy personal planner for tasks, notes, goals, and everyday life.">
+    <meta name="theme-color" content="#171319">
 
-    <!-- Theme color for mobile browser -->
-    <meta name="theme-color" content="#201a29">
+    <meta
+        name="description"
+        content="Velvet Day - Your personal space to plan, organize and focus."
+    >
+
+    <meta name="application-name" content="Velvet Day">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="black-translucent"
+    >
+    <meta
+        name="apple-mobile-web-app-title"
+        content="Velvet Day"
+    >
+
+    <title>Velvet Day | Your Personal Planner</title>
 
     <!-- PWA manifest -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="./manifest.json">
 
-    <!-- ==========================================
-         ICON LIBRARY
-         ========================================== -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- ==========================================
-         CSS FILES
-         Keep this order
-         ========================================== -->
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/responsive.css">
-    <link rel="stylesheet" href="css/animations.css">
-
+    <!-- Application stylesheets -->
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/animations.css">
+    <link rel="stylesheet" href="./css/responsive.css">
 </head>
 
 <body>
 
-    <!-- ==========================================
-         APP LOADING SCREEN
-         ========================================== -->
-    <div id="appLoading" class="app-loading">
+    <!-- =====================================================
+         APPLICATION ROOT
+    ====================================================== -->
 
-        <div class="loading-content">
-            <div class="loading-logo">♡</div>
-            <h1>Velvet Day</h1>
-            <p>Preparing your little space...</p>
-            <div class="loading-spinner"></div>
-        </div>
+    <div class="app-container" id="app">
 
-    </div>
-
-
-    <!-- ==========================================
-         APP CONTAINER
-         ========================================== -->
-    <div class="app-container" id="appContainer">
-
-        <!-- ==========================================
-             MOBILE SIDEBAR OVERLAY
-             ========================================== -->
-        <div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-
-        <!-- ==========================================
+        <!-- =================================================
              SIDEBAR
-             ========================================== -->
+        ================================================== -->
+
         <aside class="sidebar" id="sidebar">
 
-            <!-- Logo -->
             <div class="sidebar-header">
 
-                <div class="brand-container">
+                <a
+                    href="#dashboard"
+                    class="brand"
+                    data-page-target="dashboard"
+                    aria-label="Velvet Day home"
+                >
+                    <span class="brand-icon">✦</span>
 
-                    <div class="brand-icon">
-                        ♡
-                    </div>
+                    <span class="brand-name">
+                        Velvet Day
+                    </span>
+                </a>
 
-                    <div class="brand-text">
-                        <h2>Velvet Day</h2>
-                        <span>Your little universe</span>
-                    </div>
-
-                </div>
-
-                <!-- Close sidebar on mobile -->
                 <button
                     type="button"
-                    class="icon-button sidebar-close-button"
+                    class="sidebar-close"
                     id="sidebarClose"
-                    aria-label="Close sidebar"
+                    aria-label="Close navigation"
                 >
-                    <i data-lucide="x"></i>
+                    ×
                 </button>
 
             </div>
 
+            <!-- Main navigation -->
 
-            <!-- ==========================================
-                 MAIN NAVIGATION
-                 ========================================== -->
             <nav class="sidebar-navigation" aria-label="Main navigation">
 
-                <p class="navigation-label">YOUR SPACE</p>
+                <p class="navigation-heading">
+                    WORKSPACE
+                </p>
 
-                <button
-                    type="button"
-                    class="nav-item active"
-                    data-page="dashboard"
+                <a
+                    href="#dashboard"
+                    class="nav-link active"
+                    data-page-target="dashboard"
                 >
-                    <i data-lucide="layout-dashboard"></i>
+                    <span class="nav-icon">⌂</span>
                     <span>Dashboard</span>
-                </button>
+                </a>
 
-                <button
-                    type="button"
-                    class="nav-item"
-                    data-page="tasks"
+                <a
+                    href="#tasks"
+                    class="nav-link"
+                    data-page-target="tasks"
                 >
-                    <i data-lucide="list-check"></i>
+                    <span class="nav-icon">✓</span>
                     <span>My Tasks</span>
-                </button>
+                </a>
 
-                <button
-                    type="button"
-                    class="nav-item"
-                    data-page="brain"
+                <a
+                    href="#calendar"
+                    class="nav-link"
+                    data-page-target="calendar"
                 >
-                    <i data-lucide="brain"></i>
-                    <span>Brain Dump</span>
-                </button>
-
-                <button
-                    type="button"
-                    class="nav-item"
-                    data-page="notes"
-                >
-                    <i data-lucide="notebook-pen"></i>
-                    <span>Notes</span>
-                </button>
-
-                <button
-                    type="button"
-                    class="nav-item"
-                    data-page="checklist"
-                >
-                    <i data-lucide="list-todo"></i>
-                    <span>Checklists</span>
-                </button>
-
-                <button
-                    type="button"
-                    class="nav-item"
-                    data-page="calendar"
-                >
-                    <i data-lucide="calendar-days"></i>
+                    <span class="nav-icon">▦</span>
                     <span>Calendar</span>
-                </button>
+                </a>
 
+                <a
+                    href="#notes"
+                    class="nav-link"
+                    data-page-target="notes"
+                >
+                    <span class="nav-icon">▤</span>
+                    <span>Notes</span>
+                </a>
 
-                <!-- ==========================================
-                     ROUTINES
-                     ========================================== -->
-                <p class="navigation-label navigation-label-spaced">
-                    DAILY LIFE
+                <a
+                    href="#brain-dump"
+                    class="nav-link"
+                    data-page-target="brain-dump"
+                >
+                    <span class="nav-icon">☁</span>
+                    <span>Brain Dump</span>
+                </a>
+
+                <p class="navigation-heading">
+                    ORGANIZE
                 </p>
 
-                <button
-                    type="button"
-                    class="nav-item"
-                    data-page="recurring"
+                <a
+                    href="#checklists"
+                    class="nav-link"
+                    data-page-target="checklists"
                 >
-                    <i data-lucide="repeat"></i>
+                    <span class="nav-icon">☷</span>
+                    <span>Checklists</span>
+                </a>
+
+                <a
+                    href="#recurring"
+                    class="nav-link"
+                    data-page-target="recurring"
+                >
+                    <span class="nav-icon">↻</span>
                     <span>Recurring Tasks</span>
-                </button>
+                </a>
 
-                <button
-                    type="button"
-                    class="nav-item"
-                    data-page="reminders"
+                <a
+                    href="#reminders"
+                    class="nav-link"
+                    data-page-target="reminders"
                 >
-                    <i data-lucide="bell"></i>
+                    <span class="nav-icon">♧</span>
                     <span>Reminders</span>
-                </button>
+                </a>
 
-
-                <!-- ==========================================
-                     PERSONAL GROWTH
-                     ========================================== -->
-                <p class="navigation-label navigation-label-spaced">
-                    PERSONAL GROWTH
+                <p class="navigation-heading">
+                    INSIGHTS
                 </p>
 
-                <button
-                    type="button"
-                    class="nav-item"
-                    data-page="progress"
+                <a
+                    href="#progress"
+                    class="nav-link"
+                    data-page-target="progress"
                 >
-                    <i data-lucide="chart-no-axes-combined"></i>
+                    <span class="nav-icon">◷</span>
                     <span>My Progress</span>
-                </button>
-
-                <button
-                    type="button"
-                    class="nav-item"
-                    data-page="settings"
-                >
-                    <i data-lucide="settings"></i>
-                    <span>Settings</span>
-                </button>
+                </a>
 
             </nav>
 
+            <!-- Sidebar bottom -->
 
-            <!-- ==========================================
-                 SIDEBAR BOTTOM CARD
-                 ========================================== -->
-            <div class="sidebar-bottom">
+            <div class="sidebar-footer">
 
-                <div class="sidebar-quote-card">
+                <a
+                    href="#settings"
+                    class="nav-link"
+                    data-page-target="settings"
+                >
+                    <span class="nav-icon">⚙</span>
+                    <span>Settings</span>
+                </a>
 
-                    <div class="quote-icon">
-                        <i data-lucide="heart"></i>
+                <div class="sidebar-profile">
+
+                    <div class="profile-avatar">
+                        ♡
                     </div>
 
-                    <p>
-                        You don't have to do everything today.
-                        Just do what you can.
-                    </p>
+                    <div class="profile-details">
+                        <span class="profile-name">
+                            My Space
+                        </span>
 
-                    <span>♡ a gentle reminder</span>
-
-                </div>
-
-                <div class="sidebar-footer">
-
-                    <span>Made with love</span>
-                    <span>♡</span>
+                        <span class="profile-subtitle">
+                            One day at a time
+                        </span>
+                    </div>
 
                 </div>
 
@@ -244,2191 +213,1437 @@
         </aside>
 
 
-        <!-- ==========================================
-             MAIN CONTENT
-             ========================================== -->
-        <main class="main-content" id="mainContent">
+        <!-- =================================================
+             MAIN APPLICATION CONTENT
+        ================================================== -->
 
+        <main class="main-content">
 
-            <!-- ==========================================
-                 TOP BAR
-                 ========================================== -->
+            <!-- =============================================
+                 TOPBAR
+            ============================================== -->
+
             <header class="topbar">
 
                 <div class="topbar-left">
 
-                    <!-- Mobile menu button -->
                     <button
                         type="button"
-                        class="icon-button mobile-menu-button"
-                        id="mobileMenuButton"
-                        aria-label="Open menu"
+                        class="menu-toggle"
+                        id="menuToggle"
+                        aria-label="Open navigation"
                     >
-                        <i data-lucide="menu"></i>
+                        ☰
                     </button>
 
-                    <!-- Breadcrumb -->
-                    <div class="breadcrumb-container">
-                        <span class="breadcrumb-home">Velvet Day</span>
-                        <i data-lucide="chevron-right"></i>
-                        <span data-page-title>Dashboard</span>
+                    <div class="page-heading">
+                        <h1 id="pageTitle">
+                            Dashboard
+                        </h1>
+
+                        <p id="pageSubtitle">
+                            Make today a little more intentional.
+                        </p>
                     </div>
 
                 </div>
 
+                <div class="topbar-actions">
 
-                <div class="topbar-right">
+                    <!-- Global search -->
 
-                    <!-- Current date -->
-                    <div class="topbar-date" id="currentDate">
-                    </div>
+                    <button
+                        type="button"
+                        class="icon-button search-trigger"
+                        id="searchTrigger"
+                        aria-label="Open search"
+                    >
+                        ⌕
+                    </button>
 
                     <!-- Theme toggle -->
+
                     <button
                         type="button"
-                        class="icon-button theme-toggle-button"
+                        class="icon-button"
+                        id="themeToggle"
                         data-theme-toggle
                         aria-label="Toggle theme"
-                        title="Toggle theme"
                     >
-                        <i data-lucide="sun"></i>
+                        ☾
                     </button>
 
-                    <!-- Notification button -->
-                    <button
-                        type="button"
+                    <!-- Notifications -->
+
+                    <a
+                        href="#reminders"
                         class="icon-button notification-button"
-                        data-page="reminders"
-                        aria-label="Open reminders"
+                        data-page-target="reminders"
+                        aria-label="View reminders"
                     >
-                        <i data-lucide="bell"></i>
-                        <span class="notification-dot" id="notificationDot" hidden></span>
-                    </button>
-
-                    <!-- Profile decoration -->
-                    <div class="profile-avatar" title="Your personal space">
-                        <span>♡</span>
-                    </div>
+                        ♡
+                    </a>
 
                 </div>
 
             </header>
 
 
-            <!-- ==========================================
-                 PAGE CONTENT WRAPPER
-                 ========================================== -->
-            <div class="page-wrapper">
+            <!-- =============================================
+                 PAGE CONTAINER
+            ============================================== -->
+
+            <div class="page-container">
 
 
-                <!-- ======================================
-                     1. DASHBOARD
-                     ====================================== -->
+                <!-- =========================================
+                     DASHBOARD PAGE
+                ========================================== -->
+
                 <section
-                    class="page-content active"
-                    id="dashboardPage"
-                    data-page-content="dashboard"
+                    class="page-section active"
+                    id="page-dashboard"
+                    data-page="dashboard"
                 >
 
-                    <!-- Welcome -->
                     <div class="welcome-section">
 
-                        <div class="welcome-text">
+                        <div class="welcome-content">
 
-                            <p class="eyebrow">YOUR PERSONAL SPACE ♡</p>
+                            <p class="welcome-date" id="currentDate">
+                                YOUR DAILY SPACE
+                            </p>
 
-                            <h1>
-                                Hello, beautiful soul
-                                <span class="welcome-sparkle">✦</span>
-                            </h1>
+                            <h2>
+                                A little progress is still progress.
+                                <span>♡</span>
+                            </h2>
 
-                            <p class="welcome-subtitle">
-                                Take a breath. Let's make today count.
+                            <p>
+                                Organize your thoughts, plan your day
+                                and make time for yourself.
                             </p>
 
                         </div>
 
                         <div class="welcome-decoration">
-                            <div class="welcome-illustration">☁️</div>
-                            <span class="float-decoration">✦</span>
-                            <span class="float-decoration">♡</span>
+                            ✿
                         </div>
 
                     </div>
 
 
                     <!-- Dashboard statistics -->
-                    <div class="stats-grid dashboard-stats-grid">
 
-                        <div class="stat-card">
-                            <div class="stat-icon purple">
-                                <i data-lucide="clipboard-list"></i>
+                    <div class="stats-grid">
+
+                        <article class="stat-card">
+
+                            <div class="stat-card-top">
+                                <span>Today's Tasks</span>
+                                <span class="stat-icon">✓</span>
                             </div>
 
-                            <div class="stat-info">
-                                <span class="stat-label">Total Tasks</span>
-                                <h3 data-task-total>0</h3>
-                            </div>
-                        </div>
+                            <h3 id="totalTasksCount">0</h3>
 
+                            <p>Tasks planned</p>
 
-                        <div class="stat-card">
-                            <div class="stat-icon green">
-                                <i data-lucide="check-circle"></i>
-                            </div>
+                        </article>
 
-                            <div class="stat-info">
-                                <span class="stat-label">Completed</span>
-                                <h3 data-task-completed>0</h3>
-                            </div>
-                        </div>
+                        <article class="stat-card">
 
-
-                        <div class="stat-card">
-                            <div class="stat-icon orange">
-                                <i data-lucide="clock"></i>
+                            <div class="stat-card-top">
+                                <span>Completed</span>
+                                <span class="stat-icon">♡</span>
                             </div>
 
-                            <div class="stat-info">
-                                <span class="stat-label">Pending</span>
-                                <h3 data-task-pending>0</h3>
-                            </div>
-                        </div>
+                            <h3 id="completedTasksCount">0</h3>
 
+                            <p>Tasks completed</p>
 
-                        <div class="stat-card">
-                            <div class="stat-icon pink">
-                                <i data-lucide="calendar-check"></i>
+                        </article>
+
+                        <article class="stat-card">
+
+                            <div class="stat-card-top">
+                                <span>Pending</span>
+                                <span class="stat-icon">◷</span>
                             </div>
 
-                            <div class="stat-info">
-                                <span class="stat-label">Due Today</span>
-                                <h3 data-task-today>0</h3>
+                            <h3 id="pendingTasksCount">0</h3>
+
+                            <p>Still to do</p>
+
+                        </article>
+
+                        <article class="stat-card">
+
+                            <div class="stat-card-top">
+                                <span>Productivity</span>
+                                <span class="stat-icon">✧</span>
                             </div>
-                        </div>
+
+                            <h3 id="productivityPercentage">0%</h3>
+
+                            <p>Today's progress</p>
+
+                        </article>
 
                     </div>
 
 
-                    <!-- Dashboard grid -->
+                    <!-- Dashboard content grid -->
+
                     <div class="dashboard-grid">
 
+                        <!-- Today's tasks -->
 
-                        <!-- ==================================
-                             TODAY'S TASKS
-                             ================================== -->
-                        <div class="dashboard-card today-tasks-card">
+                        <article class="content-card dashboard-tasks-card">
 
                             <div class="card-header">
 
                                 <div>
-                                    <h3>Today's Tasks</h3>
-                                    <p>Your focus for today ✨</p>
+                                    <h3>Today's Focus</h3>
+                                    <p>Small steps make a difference.</p>
                                 </div>
 
-                                <button
-                                    type="button"
-                                    class="text-button"
-                                    data-page="tasks"
+                                <a
+                                    href="#tasks"
+                                    class="text-link"
+                                    data-page-target="tasks"
                                 >
-                                    View all
-                                    <i data-lucide="arrow-right"></i>
+                                    View all →
+                                </a>
+
+                            </div>
+
+                            <form id="taskForm" class="quick-task-form">
+
+                                <input
+                                    type="text"
+                                    id="taskInput"
+                                    name="task"
+                                    placeholder="Add a little task..."
+                                    autocomplete="off"
+                                    required
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="primary-button"
+                                >
+                                    + Add
                                 </button>
 
+                                <input
+                                    type="hidden"
+                                    id="taskPriority"
+                                    name="priority"
+                                    value="medium"
+                                >
+
+                            </form>
+
+                            <div
+                                class="task-list"
+                                id="taskList"
+                            >
+                                <!-- Tasks rendered by tasks.js -->
                             </div>
 
-                            <div id="dashboardTasksContainer" class="dashboard-task-list">
-                                <!-- Dashboard tasks rendered by JavaScript -->
+                            <div
+                                class="empty-state"
+                                id="dashboardTasksEmpty"
+                            >
+                                <span>♡</span>
+                                <p>Your task list is waiting for you.</p>
                             </div>
 
-                        </div>
+                        </article>
 
 
-                        <!-- ==================================
-                             DAILY PROGRESS
-                             ================================== -->
-                        <div class="dashboard-card daily-progress-card">
+                        <!-- Daily progress -->
+
+                        <article class="content-card progress-card">
 
                             <div class="card-header">
 
                                 <div>
                                     <h3>Daily Progress</h3>
-                                    <p>Little steps matter 🌷</p>
+                                    <p>Celebrate every little win.</p>
                                 </div>
+
+                                <span class="card-decoration">✧</span>
 
                             </div>
 
-                            <div class="daily-progress-content">
+                            <div class="progress-visual">
 
-                                <div class="progress-circle-container">
+                                <div
+                                    class="progress-circle"
+                                    id="dashboardProgressCircle"
+                                >
+                                    <div class="progress-circle-inner">
 
-                                    <div class="progress-circle" id="dashboardProgressCircle">
+                                        <strong id="dashboardProgressPercentage">
+                                            0%
+                                        </strong>
 
-                                        <div class="progress-circle-inner">
-                                            <strong data-dashboard-progress>0%</strong>
-                                            <span>completed</span>
-                                        </div>
+                                        <span>completed</span>
 
                                     </div>
-
-                                </div>
-
-                                <div class="progress-summary">
-                                    <p>
-                                        <strong data-dashboard-completed>0</strong>
-                                        tasks completed today
-                                    </p>
-
-                                    <p class="progress-motivation" id="dashboardMotivation">
-                                        Let's start with one small thing.
-                                    </p>
                                 </div>
 
                             </div>
 
-                        </div>
+                            <p
+                                class="progress-message"
+                                id="dashboardProgressMessage"
+                            >
+                                Start with one small task today.
+                            </p>
+
+                        </article>
 
 
-                        <!-- ==================================
-                             QUICK CAPTURE
-                             ================================== -->
-                        <div class="dashboard-card quick-capture-card">
+                        <!-- Brain dump preview -->
+
+                        <article class="content-card brain-dump-card">
 
                             <div class="card-header">
 
                                 <div>
-                                    <h3>Quick Brain Dump</h3>
-                                    <p>Get it out of your head 💭</p>
+                                    <h3>Brain Dump</h3>
+                                    <p>Let your thoughts out.</p>
                                 </div>
 
-                                <i data-lucide="brain" class="card-header-icon"></i>
+                                <a
+                                    href="#brain-dump"
+                                    class="text-link"
+                                    data-page-target="brain-dump"
+                                >
+                                    Open →
+                                </a>
 
                             </div>
 
-                            <form id="quickBrainDumpForm" class="quick-capture-form">
+                            <form id="brainDumpForm">
 
                                 <textarea
-                                    id="quickBrainDumpInput"
-                                    placeholder="Random thought, idea, reminder..."
-                                    rows="3"
+                                    id="brainDumpInput"
+                                    name="brainDump"
+                                    rows="4"
+                                    placeholder="Write down anything on your mind..."
                                 ></textarea>
 
                                 <button
                                     type="submit"
-                                    class="primary-button"
+                                    class="secondary-button"
                                 >
-                                    <i data-lucide="plus"></i>
-                                    <span>Save thought</span>
+                                    Save thought
                                 </button>
 
                             </form>
 
-                            <button
-                                type="button"
-                                class="text-button quick-capture-view-all"
-                                data-page="brain"
+                            <div
+                                class="brain-dump-list"
+                                id="brainDumpList"
                             >
-                                View all thoughts
-                                <i data-lucide="arrow-right"></i>
-                            </button>
+                                <!-- Brain dump entries rendered by brain-dump.js -->
+                            </div>
 
-                        </div>
+                        </article>
 
 
-                        <!-- ==================================
-                             UPCOMING REMINDERS
-                             ================================== -->
-                        <div class="dashboard-card upcoming-reminders-card">
+                        <!-- Upcoming reminders -->
+
+                        <article class="content-card reminders-preview-card">
 
                             <div class="card-header">
 
                                 <div>
                                     <h3>Upcoming Reminders</h3>
-                                    <p>Things to remember ♡</p>
+                                    <p>Things you don't want to forget.</p>
                                 </div>
 
-                                <button
-                                    type="button"
-                                    class="text-button"
-                                    data-page="reminders"
+                                <a
+                                    href="#reminders"
+                                    class="text-link"
+                                    data-page-target="reminders"
                                 >
-                                    View all
-                                    <i data-lucide="arrow-right"></i>
-                                </button>
+                                    View all →
+                                </a>
 
                             </div>
 
-                            <div id="dashboardRemindersContainer">
-                                <!-- Reminders rendered by JavaScript -->
+                            <div
+                                id="dashboardRemindersList"
+                                class="reminder-list"
+                            >
+                                <!-- Reminders rendered by reminders.js -->
                             </div>
 
-                        </div>
-
-
-                    </div>
-
-
-                    <!-- ======================================
-                         DAILY INSPIRATION
-                         ====================================== -->
-                    <div class="dashboard-card inspiration-card">
-
-                        <div class="inspiration-decoration">
-                            ✦
-                        </div>
-
-                        <div class="inspiration-content">
-
-                            <span class="eyebrow">A LITTLE REMINDER FOR YOU</span>
-
-                            <h2 id="dailyQuote">
-                                You are allowed to grow at your own pace.
-                            </h2>
-
-                            <p>
-                                Your journey doesn't need to look like anyone else's.
-                            </p>
-
-                        </div>
-
-                        <div class="inspiration-heart">
-                            ♡
-                        </div>
+                        </article>
 
                     </div>
 
                 </section>
 
 
-                <!-- ==========================================
-                     2. TASKS PAGE
-                     ========================================== -->
+                <!-- =========================================
+                     TASKS PAGE
+                ========================================== -->
+
                 <section
-                    class="page-content"
-                    id="tasksPage"
-                    data-page-content="tasks"
+                    class="page-section"
+                    id="page-tasks"
+                    data-page="tasks"
                 >
 
-                    <div class="page-heading">
-
-                        <div>
-                            <p class="eyebrow">YOUR LITTLE TO-DO CORNER ✨</p>
-                            <h1>My Tasks</h1>
-
-                            <p class="page-description">
-                                One thing at a time. You got this! 💜
-                            </p>
-                        </div>
-
-                        <button
-                            type="button"
-                            class="primary-button"
-                            data-add-task
-                        >
-                            <i data-lucide="plus"></i>
-                            <span>Add Task</span>
-                        </button>
-
+                    <div class="section-intro">
+                        <h2>My Tasks <span>♡</span></h2>
+                        <p>Keep your day organized, one task at a time.</p>
                     </div>
 
 
-                    <!-- Task statistics -->
-                    <div class="stats-grid">
-
-                        <div class="stat-card">
-                            <div class="stat-icon purple">
-                                <i data-lucide="clipboard-list"></i>
-                            </div>
-
-                            <div class="stat-info">
-                                <span class="stat-label">Total Tasks</span>
-                                <h3 data-task-total>0</h3>
-                            </div>
-                        </div>
-
-
-                        <div class="stat-card">
-                            <div class="stat-icon green">
-                                <i data-lucide="check-circle"></i>
-                            </div>
-
-                            <div class="stat-info">
-                                <span class="stat-label">Completed</span>
-                                <h3 data-task-completed>0</h3>
-                            </div>
-                        </div>
-
-
-                        <div class="stat-card">
-                            <div class="stat-icon orange">
-                                <i data-lucide="clock"></i>
-                            </div>
-
-                            <div class="stat-info">
-                                <span class="stat-label">Pending</span>
-                                <h3 data-task-pending>0</h3>
-                            </div>
-                        </div>
-
-
-                        <div class="stat-card">
-                            <div class="stat-icon pink">
-                                <i data-lucide="alert-circle"></i>
-                            </div>
-
-                            <div class="stat-info">
-                                <span class="stat-label">Overdue</span>
-                                <h3 data-task-overdue>0</h3>
-                            </div>
-                        </div>
-
-                    </div>
-
-
-                    <!-- Task progress -->
-                    <div class="dashboard-card task-progress-card">
+                    <article class="content-card">
 
                         <div class="card-header">
-
                             <div>
-                                <h3>Task Progress</h3>
-                                <p>Look how far you've come 🌷</p>
+                                <h3>Add a New Task</h3>
+                                <p>Write down what you need to do.</p>
                             </div>
-
-                            <span class="progress-percentage" data-task-progress>
-                                0%
-                            </span>
-
                         </div>
 
-                        <div class="progress-bar">
-                            <div
-                                class="progress-bar-fill"
-                                data-task-progress-bar
-                                style="width: 0%"
-                            ></div>
-                        </div>
-
-                        <p class="progress-caption" data-task-progress-label>
-                            Let's make today productive!
-                        </p>
-
-                    </div>
-
-
-                    <!-- Search and sort -->
-                    <div class="task-toolbar">
-
-                        <div class="search-container task-search">
-
-                            <i data-lucide="search"></i>
-
-                            <input
-                                type="text"
-                                id="taskSearch"
-                                placeholder="Search your tasks..."
-                                autocomplete="off"
-                            >
-
-                            <button
-                                type="button"
-                                class="icon-button"
-                                id="clearTaskSearch"
-                                aria-label="Clear search"
-                                hidden
-                            >
-                                <i data-lucide="x"></i>
-                            </button>
-
-                        </div>
-
-
-                        <div class="task-sort-container">
-
-                            <i data-lucide="arrow-up-down"></i>
-
-                            <select id="taskSort">
-
-                                <option value="recent">Recently Added</option>
-                                <option value="dueDate">Due Date</option>
-                                <option value="priority">Priority</option>
-                                <option value="alphabetical">Alphabetical</option>
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Filters -->
-                    <div class="task-filter-bar">
-
-                        <button
-                            type="button"
-                            class="filter-button active"
-                            data-task-filter="all"
-                        >
-                            All Tasks
-                        </button>
-
-                        <button
-                            type="button"
-                            class="filter-button"
-                            data-task-filter="today"
-                        >
-                            <i data-lucide="calendar"></i>
-                            Today
-                        </button>
-
-                        <button
-                            type="button"
-                            class="filter-button"
-                            data-task-filter="pending"
-                        >
-                            <i data-lucide="clock"></i>
-                            Pending
-                        </button>
-
-                        <button
-                            type="button"
-                            class="filter-button"
-                            data-task-filter="completed"
-                        >
-                            <i data-lucide="check-circle"></i>
-                            Completed
-                        </button>
-
-                        <button
-                            type="button"
-                            class="filter-button"
-                            data-task-filter="overdue"
-                        >
-                            <i data-lucide="alert-circle"></i>
-                            Overdue
-                        </button>
-
-                        <button
-                            type="button"
-                            class="filter-button"
-                            data-task-filter="high"
-                        >
-                            <i data-lucide="flame"></i>
-                            High Priority
-                        </button>
-
-                    </div>
-
-
-                    <!-- Tasks -->
-                    <div class="task-list-section">
-
-                        <div class="task-list-header">
-
-                            <div>
-                                <h3>Your Tasks</h3>
-                                <p>Keep moving at your own pace 💜</p>
-                            </div>
-
-                        </div>
-
-                        <div
-                            id="tasksContainer"
-                            class="tasks-container"
-                        >
-                            <!-- Tasks dynamically generated here -->
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <!-- ==========================================
-                     3. BRAIN DUMP
-                     ========================================== -->
-                <section
-                    class="page-content"
-                    id="brainPage"
-                    data-page-content="brain"
-                >
-
-                    <div class="page-heading">
-
-                        <div>
-                            <p class="eyebrow">LET IT ALL OUT 💭</p>
-                            <h1>Brain Dump</h1>
-
-                            <p class="page-description">
-                                Your mind doesn't have to hold everything.
-                            </p>
-                        </div>
-
-                    </div>
-
-
-                    <!-- Brain dump capture area -->
-                    <div class="dashboard-card brain-dump-input-card">
-
-                        <div class="brain-dump-decoration">
-                            ✧
-                        </div>
-
-                        <form id="brainDumpForm">
+                        <form id="fullTaskForm" class="task-entry-form">
 
                             <div class="form-group">
 
-                                <label for="brainDumpInput">
-                                    What's on your mind?
+                                <label for="fullTaskInput">
+                                    Task name
                                 </label>
 
-                                <textarea
-                                    id="brainDumpInput"
-                                    name="content"
-                                    rows="6"
-                                    placeholder="Thoughts, ideas, worries, random things, things you need to remember... just write. Don't organize it."
-                                ></textarea>
-
-                            </div>
-
-                            <div class="brain-dump-form-footer">
-
-                                <span class="brain-dump-helper">
-                                    No judgment. No organizing. Just you.
-                                </span>
-
-                                <button
-                                    type="submit"
-                                    class="primary-button"
+                                <input
+                                    type="text"
+                                    id="fullTaskInput"
+                                    name="task"
+                                    placeholder="What needs to be done?"
+                                    required
                                 >
-                                    <i data-lucide="save"></i>
-                                    Save Thought
-                                </button>
 
                             </div>
+
+                            <div class="form-row">
+
+                                <div class="form-group">
+
+                                    <label for="fullTaskPriority">
+                                        Priority
+                                    </label>
+
+                                    <select
+                                        id="fullTaskPriority"
+                                        name="priority"
+                                    >
+                                        <option value="low">Low</option>
+                                        <option value="medium" selected>
+                                            Medium
+                                        </option>
+                                        <option value="high">High</option>
+                                    </select>
+
+                                </div>
+
+                                <div class="form-group">
+
+                                    <label for="fullTaskDueDate">
+                                        Due date
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        id="fullTaskDueDate"
+                                        name="dueDate"
+                                    >
+
+                                </div>
+
+                                <div class="form-group">
+
+                                    <label for="fullTaskCategory">
+                                        Category
+                                    </label>
+
+                                    <select
+                                        id="fullTaskCategory"
+                                        name="category"
+                                    >
+                                        <option value="personal">Personal</option>
+                                        <option value="work">Work</option>
+                                        <option value="study">Study</option>
+                                        <option value="other">Other</option>
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="primary-button"
+                            >
+                                + Add Task
+                            </button>
 
                         </form>
 
-                    </div>
+                    </article>
 
 
-                    <!-- Brain dump search -->
-                    <div class="task-toolbar">
-
-                        <div class="search-container">
-
-                            <i data-lucide="search"></i>
-
-                            <input
-                                type="search"
-                                id="brainDumpSearch"
-                                placeholder="Search your thoughts..."
-                            >
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Brain dump entries -->
-                    <div class="brain-dump-list-section">
+                    <article class="content-card task-management-card">
 
                         <div class="card-header">
 
                             <div>
-                                <h3>Your Thoughts</h3>
-                                <p>A space for everything floating around in your mind.</p>
+                                <h3>Your Tasks</h3>
+                                <p>Manage everything you need to do.</p>
                             </div>
 
-                            <button
-                                type="button"
-                                class="secondary-button"
-                                id="clearBrainDump"
-                            >
-                                <i data-lucide="trash-2"></i>
-                                Clear All
-                            </button>
+                            <div class="task-filters">
+
+                                <select
+                                    id="taskFilter"
+                                    aria-label="Filter tasks"
+                                >
+                                    <option value="all">All tasks</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+
+                            </div>
 
                         </div>
 
                         <div
-                            id="brainDumpContainer"
-                            class="brain-dump-grid"
+                            id="taskListPage"
+                            class="task-list"
                         >
-                            <!-- Thoughts rendered here -->
+                            <!-- Tasks rendered by tasks.js -->
                         </div>
 
-                    </div>
+                    </article>
 
                 </section>
 
 
-                <!-- ==========================================
-                     4. NOTES
-                     ========================================== -->
+                <!-- =========================================
+                     CALENDAR PAGE
+                ========================================== -->
+
                 <section
-                    class="page-content"
-                    id="notesPage"
-                    data-page-content="notes"
+                    class="page-section"
+                    id="page-calendar"
+                    data-page="calendar"
                 >
 
-                    <div class="page-heading">
-
-                        <div>
-                            <p class="eyebrow">YOUR LITTLE NOTEBOOK 📖</p>
-                            <h1>My Notes</h1>
-
-                            <p class="page-description">
-                                Save ideas, thoughts and things worth remembering.
-                            </p>
-                        </div>
-
-                        <button
-                            type="button"
-                            class="primary-button"
-                            data-add-note
-                        >
-                            <i data-lucide="plus"></i>
-                            New Note
-                        </button>
-
+                    <div class="section-intro">
+                        <h2>Your Calendar <span>✿</span></h2>
+                        <p>See your plans and keep track of important dates.</p>
                     </div>
 
 
-                    <!-- Notes search -->
-                    <div class="task-toolbar">
-
-                        <div class="search-container">
-
-                            <i data-lucide="search"></i>
-
-                            <input
-                                type="search"
-                                id="notesSearch"
-                                placeholder="Search notes..."
-                            >
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Notes -->
-                    <div
-                        id="notesContainer"
-                        class="notes-grid"
-            >
-                        <!-- Notes rendered here -->
-                    </div>
-
-                </section>
-
-
-                <!-- ==========================================
-                     5. CHECKLISTS
-                     ========================================== -->
-                <section
-                    class="page-content"
-                    id="checklistPage"
-                    data-page-content="checklist"
-                >
-
-                    <div class="page-heading">
-
-                        <div>
-                            <p class="eyebrow">CHECK IT OFF ♡</p>
-                            <h1>Checklists</h1>
-
-                            <p class="page-description">
-                                Make life a little easier with ready-to-use lists.
-                            </p>
-                        </div>
-
-                        <button
-                            type="button"
-                            class="primary-button"
-                            data-add-checklist
-                        >
-                            <i data-lucide="plus"></i>
-                            New Checklist
-                        </button>
-
-                    </div>
-
-
-                    <!-- Checklist templates -->
-                    <div class="checklist-template-section">
-
-                        <div class="card-header">
-                            <div>
-                                <h3>Quick Templates</h3>
-                                <p>Start with a little inspiration ✨</p>
-                            </div>
-                        </div>
-
-                        <div class="template-grid">
-
-                            <button
-                                type="button"
-                                class="template-card"
-                                data-checklist-template="daily"
-                            >
-                                <div class="template-icon">🌷</div>
-                                <h4>Daily Routine</h4>
-                                <p>Make your everyday routine</p>
-                            </button>
-
-                            <button
-                                type="button"
-                                class="template-card"
-                                data-checklist-template="travel"
-                            >
-                                <div class="template-icon">🧳</div>
-                                <h4>Travel Packing</h4>
-                                <p>Don't forget anything</p>
-                            </button>
-
-                            <button
-                                type="button"
-                                class="template-card"
-                                data-checklist-template="shopping"
-                            >
-                                <div class="template-icon">🛍️</div>
-                                <h4>Shopping List</h4>
-                                <p>Things you need to buy</p>
-                            </button>
-
-                            <button
-                                type="button"
-                                class="template-card"
-                                data-checklist-template="study"
-                            >
-                                <div class="template-icon">📚</div>
-                                <h4>Study Checklist</h4>
-                                <p>Organize your study sessions</p>
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- User checklists -->
-                    <div class="checklist-list-section">
-
-                        <div class="card-header">
-                            <div>
-                                <h3>My Lists</h3>
-                                <p>Your personal checklists</p>
-                            </div>
-                        </div>
-
-                        <div
-                            id="checklistContainer"
-                            class="checklist-grid"
-                        >
-                            <!-- Checklists rendered here -->
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <!-- ==========================================
-                     6. CALENDAR
-                     ========================================== -->
-                <section
-                    class="page-content"
-                    id="calendarPage"
-                    data-page-content="calendar"
-                >
-
-                    <div class="page-heading">
-
-                        <div>
-                            <p class="eyebrow">YOUR TIME, YOUR WAY 🗓️</p>
-                            <h1>Calendar</h1>
-
-                            <p class="page-description">
-                                Plan your days without overwhelming yourself.
-                            </p>
-                        </div>
-
-                        <button
-                            type="button"
-                            class="primary-button"
-                            data-add-task
-                        >
-                            <i data-lucide="plus"></i>
-                            Add Task
-                        </button>
-
-                    </div>
-
-
-                    <!-- Calendar -->
-                    <div class="dashboard-card calendar-card">
+                    <article class="content-card calendar-card">
 
                         <div class="calendar-header">
 
                             <button
                                 type="button"
+                                id="prevMonth"
                                 class="icon-button"
-                                id="calendarPrevious"
                                 aria-label="Previous month"
                             >
-                                <i data-lucide="chevron-left"></i>
+                                ←
                             </button>
 
-                            <div class="calendar-title-container">
-                                <h2 id="calendarMonthTitle">Month Year</h2>
-
-                                <button
-                                    type="button"
-                                    class="text-button"
-                                    id="calendarToday"
-                                >
-                                    Today
-                                </button>
-                            </div>
+                            <h3 id="calendarTitle">
+                                Calendar
+                            </h3>
 
                             <button
                                 type="button"
+                                id="nextMonth"
                                 class="icon-button"
-                                id="calendarNext"
                                 aria-label="Next month"
                             >
-                                <i data-lucide="chevron-right"></i>
+                                →
                             </button>
 
                         </div>
 
-
-                        <!-- Calendar weekdays -->
-                        <div class="calendar-day-name">
-                            <div>Sun</div>
-                            <div>Mon</div>
-                            <div>Tue</div>
-                            <div>Wed</div>
-                            <div>Thu</div>
-                            <div>Fri</div>
-                            <div>Sat</div>
-                        </div>
-
-
-                        <!-- Calendar dates -->
                         <div
                             class="calendar-grid"
-                            id="fullCalendar"
+                            id="calendarGrid"
                         >
-                            <!-- Calendar days rendered here -->
+                            <!-- Calendar rendered by calendar.js -->
                         </div>
 
+                    </article>
+
+
+                    <article class="content-card">
+
+                        <div class="card-header">
+
+                            <div>
+                                <h3>Selected Day</h3>
+                                <p id="selectedCalendarDate">
+                                    Select a date to see your plans.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div id="calendarEvents">
+                            <!-- Calendar events rendered by calendar.js -->
+                        </div>
+
+                    </article>
+
+                </section>
+
+
+                <!-- =========================================
+                     NOTES PAGE
+                ========================================== -->
+
+                <section
+                    class="page-section"
+                    id="page-notes"
+                    data-page="notes"
+                >
+
+                    <div class="section-intro">
+                        <h2>My Notes <span>✧</span></h2>
+                        <p>A cozy corner for all your ideas and notes.</p>
                     </div>
 
 
-                    <!-- Selected day tasks -->
-                    <div class="dashboard-card calendar-selected-day-card">
+                    <article class="content-card">
 
                         <div class="card-header">
                             <div>
-                                <h3 id="selectedCalendarDate">Select a date</h3>
-                                <p>Tasks scheduled for this day</p>
+                                <h3>Create a Note</h3>
+                                <p>Capture anything worth remembering.</p>
                             </div>
                         </div>
 
-                        <div id="calendarTasksContainer">
-                            <!-- Selected day tasks -->
-                        </div>
+                        <form id="noteForm">
 
+                            <div class="form-group">
+
+                                <label for="noteTitle">
+                                    Title
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="noteTitle"
+                                    name="title"
+                                    placeholder="Give your note a title..."
+                                    required
+                                >
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="noteContent">
+                                    Your note
+                                </label>
+
+                                <textarea
+                                    id="noteContent"
+                                    name="content"
+                                    rows="5"
+                                    placeholder="Start writing..."
+                                    required
+                                ></textarea>
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="primary-button"
+                            >
+                                Save Note
+                            </button>
+
+                        </form>
+
+                    </article>
+
+
+                    <div
+                        class="notes-grid"
+                        id="notesGrid"
+                    >
+                        <!-- Notes rendered by notes.js -->
                     </div>
 
                 </section>
 
 
-                <!-- ==========================================
-                     7. RECURRING TASKS
-                     ========================================== -->
+                <!-- =========================================
+                     BRAIN DUMP PAGE
+                ========================================== -->
+
                 <section
-                    class="page-content"
-                    id="recurringPage"
-                    data-page-content="recurring"
+                    class="page-section"
+                    id="page-brain-dump"
+                    data-page="brain-dump"
                 >
 
-                    <div class="page-heading">
+                    <div class="section-intro">
+                        <h2>Brain Dump <span>☁</span></h2>
+                        <p>Clear your mind. You don't have to organize everything.</p>
+                    </div>
 
-                        <div>
-                            <p class="eyebrow">LITTLE HABITS, BIG THINGS ♡</p>
-                            <h1>Recurring Tasks</h1>
 
-                            <p class="page-description">
-                                Create routines that make life easier.
-                            </p>
+                    <article class="content-card brain-dump-main-card">
+
+                        <form id="brainDumpPageForm">
+
+                            <div class="form-group">
+
+                                <label for="brainDumpPageInput">
+                                    What's on your mind?
+                                </label>
+
+                                <textarea
+                                    id="brainDumpPageInput"
+                                    name="brainDump"
+                                    rows="7"
+                                    placeholder="Random thoughts, ideas, plans, worries, dreams... write everything here."
+                                ></textarea>
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="primary-button"
+                            >
+                                Save my thoughts
+                            </button>
+
+                        </form>
+
+                    </article>
+
+
+                    <article class="content-card">
+
+                        <div class="card-header">
+                            <div>
+                                <h3>My Thoughts</h3>
+                                <p>Everything you've written down.</p>
+                            </div>
                         </div>
 
-                        <button
-                            type="button"
-                            class="primary-button"
-                            data-add-recurring
+                        <div
+                            id="brainDumpPageList"
+                            class="brain-dump-list"
                         >
-                            <i data-lucide="plus"></i>
-                            New Routine
-                        </button>
+                            <!-- Brain dump entries rendered by brain-dump.js -->
+                        </div>
 
+                    </article>
+
+                </section>
+
+
+                <!-- =========================================
+                     CHECKLISTS PAGE
+                ========================================== -->
+
+                <section
+                    class="page-section"
+                    id="page-checklists"
+                    data-page="checklists"
+                >
+
+                    <div class="section-intro">
+                        <h2>My Checklists <span>♡</span></h2>
+                        <p>Make little lists for all the things that matter.</p>
                     </div>
 
 
-                    <!-- Recurring task statistics -->
-                    <div class="stats-grid">
+                    <article class="content-card">
 
-                        <div class="stat-card">
-                            <div class="stat-icon purple">
-                                <i data-lucide="repeat"></i>
-                            </div>
-
-                            <div class="stat-info">
-                                <span class="stat-label">Active Routines</span>
-                                <h3 data-recurring-total>0</h3>
+                        <div class="card-header">
+                            <div>
+                                <h3>Create a Checklist</h3>
+                                <p>Start a new list.</p>
                             </div>
                         </div>
 
-                        <div class="stat-card">
-                            <div class="stat-icon green">
-                                <i data-lucide="check-check"></i>
+                        <form id="checklistForm">
+
+                            <div class="form-group">
+
+                                <label for="checklistTitle">
+                                    Checklist name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="checklistTitle"
+                                    name="title"
+                                    placeholder="e.g. Weekend packing list"
+                                    required
+                                >
+
                             </div>
 
-                            <div class="stat-info">
-                                <span class="stat-label">Completed Today</span>
-                                <h3 data-recurring-completed>0</h3>
-                            </div>
-                        </div>
+                            <button
+                                type="submit"
+                                class="primary-button"
+                            >
+                                + Create Checklist
+                            </button>
 
+                        </form>
+
+                    </article>
+
+
+                    <div
+                        class="checklists-grid"
+                        id="checklistsGrid"
+                    >
+                        <!-- Checklists rendered by checklists.js -->
+                    </div>
+
+                    <div
+                        id="checklistList"
+                        class="checklist-list"
+                    >
+                        <!-- Checklist items rendered by checklists.js -->
+                    </div>
+
+                </section>
+
+
+                <!-- =========================================
+                     RECURRING TASKS PAGE
+                ========================================== -->
+
+                <section
+                    class="page-section"
+                    id="page-recurring"
+                    data-page="recurring"
+                >
+
+                    <div class="section-intro">
+                        <h2>Recurring Tasks <span>↻</span></h2>
+                        <p>Build routines through small, consistent actions.</p>
                     </div>
 
 
-                    <!-- Recurring tasks -->
-                    <div class="dashboard-card recurring-card">
+                    <article class="content-card">
+
+                        <div class="card-header">
+                            <div>
+                                <h3>Create a Recurring Task</h3>
+                                <p>Choose something you want to repeat.</p>
+                            </div>
+                        </div>
+
+                        <form id="recurringForm">
+
+                            <div class="form-group">
+
+                                <label for="recurringTaskInput">
+                                    Task name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="recurringTaskInput"
+                                    name="task"
+                                    placeholder="e.g. Read for 20 minutes"
+                                    required
+                                >
+
+                            </div>
+
+                            <div class="form-row">
+
+                                <div class="form-group">
+
+                                    <label for="recurringFrequency">
+                                        Frequency
+                                    </label>
+
+                                    <select
+                                        id="recurringFrequency"
+                                        name="frequency"
+                                    >
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                    </select>
+
+                                </div>
+
+                                <div class="form-group">
+
+                                    <label for="recurringTime">
+                                        Preferred time
+                                    </label>
+
+                                    <input
+                                        type="time"
+                                        id="recurringTime"
+                                        name="time"
+                                    >
+
+                                </div>
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="primary-button"
+                            >
+                                + Add Routine
+                            </button>
+
+                        </form>
+
+                    </article>
+
+
+                    <article class="content-card">
 
                         <div class="card-header">
                             <div>
                                 <h3>My Routines</h3>
-                                <p>Consistency over perfection 🌱</p>
+                                <p>Your repeating tasks.</p>
                             </div>
                         </div>
 
                         <div
-                            id="recurringTasksContainer"
-                            class="recurring-tasks-container"
+                            id="recurringList"
+                            class="recurring-list"
                         >
-                            <!-- Recurring tasks rendered here -->
+                            <!-- Recurring tasks rendered by recurring.js -->
                         </div>
 
-                    </div>
+                    </article>
 
                 </section>
 
 
-                <!-- ==========================================
-                     8. REMINDERS
-                     ========================================== -->
+                <!-- =========================================
+                     REMINDERS PAGE
+                ========================================== -->
+
                 <section
-                    class="page-content"
-                    id="remindersPage"
-                    data-page-content="reminders"
+                    class="page-section"
+                    id="page-reminders"
+                    data-page="reminders"
                 >
 
-                    <div class="page-heading">
-
-                        <div>
-                            <p class="eyebrow">DON'T FORGET, OKAY? ♡</p>
-                            <h1>Reminders</h1>
-
-                            <p class="page-description">
-                                Important things deserve a little reminder.
-                            </p>
-                        </div>
-
-                        <button
-                            type="button"
-                            class="primary-button"
-                            data-add-reminder
-                        >
-                            <i data-lucide="plus"></i>
-                            Add Reminder
-                        </button>
-
+                    <div class="section-intro">
+                        <h2>My Reminders <span>♡</span></h2>
+                        <p>Little reminders for the things that matter.</p>
                     </div>
 
 
-                    <!-- Notification permission -->
-                    <div class="dashboard-card notification-permission-card">
-
-                        <div class="notification-permission-content">
-
-                            <div class="stat-icon purple">
-                                <i data-lucide="bell-ring"></i>
-                            </div>
-
-                            <div>
-                                <h3>Browser Notifications</h3>
-
-                                <p>
-                                    Allow notifications so Velvet Day can remind
-                                    you about important things.
-                                </p>
-
-                                <span id="notificationPermissionStatus">
-                                    Permission status: Not requested
-                                </span>
-                            </div>
-
-                        </div>
-
-                        <button
-                            type="button"
-                            class="secondary-button"
-                            id="enableNotifications"
-                        >
-                            Enable Notifications
-                        </button>
-
-                    </div>
-
-
-                    <!-- Reminder list -->
-                    <div class="dashboard-card reminders-list-card">
+                    <article class="content-card">
 
                         <div class="card-header">
                             <div>
-                                <h3>My Reminders</h3>
-                                <p>Upcoming things to remember</p>
+                                <h3>Create a Reminder</h3>
+                                <p>Set a reminder for an important moment.</p>
+                            </div>
+                        </div>
+
+                        <form id="reminderForm">
+
+                            <div class="form-group">
+
+                                <label for="reminderTitle">
+                                    Reminder title
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="reminderTitle"
+                                    name="title"
+                                    placeholder="What should I remind you about?"
+                                    required
+                                >
+
+                            </div>
+
+                            <div class="form-row">
+
+                                <div class="form-group">
+
+                                    <label for="reminderDateTime">
+                                        Date and time
+                                    </label>
+
+                                    <input
+                                        type="datetime-local"
+                                        id="reminderDateTime"
+                                        name="dateTime"
+                                        required
+                                    >
+
+                                </div>
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="primary-button"
+                            >
+                                + Set Reminder
+                            </button>
+
+                        </form>
+
+                    </article>
+
+
+                    <article class="content-card">
+
+                        <div class="card-header">
+                            <div>
+                                <h3>All Reminders</h3>
+                                <p>Keep track of what's coming up.</p>
                             </div>
                         </div>
 
                         <div
-                            id="remindersContainer"
-                            class="reminders-container"
+                            id="reminderList"
+                            class="reminder-list"
                         >
-                            <!-- Reminders rendered here -->
+                            <!-- Reminders rendered by reminders.js -->
                         </div>
 
-                    </div>
+                    </article>
 
                 </section>
 
 
-                <!-- ==========================================
-                     9. PROGRESS
-                     ========================================== -->
+                <!-- =========================================
+                     PROGRESS PAGE
+                ========================================== -->
+
                 <section
-                    class="page-content"
-                    id="progressPage"
-                    data-page-content="progress"
+                    class="page-section"
+                    id="page-progress"
+                    data-page="progress"
                 >
 
-                    <div class="page-heading">
-
-                        <div>
-                            <p class="eyebrow">LOOK HOW FAR YOU'VE COME ✨</p>
-                            <h1>My Progress</h1>
-
-                            <p class="page-description">
-                                Every little step deserves to be celebrated.
-                            </p>
-                        </div>
-
+                    <div class="section-intro">
+                        <h2>My Progress <span>✧</span></h2>
+                        <p>Look how far you've come. Every step counts.</p>
                     </div>
 
 
-                    <!-- Progress stats -->
                     <div class="stats-grid">
 
-                        <div class="stat-card">
-                            <div class="stat-icon purple">
-                                <i data-lucide="check-circle"></i>
-                            </div>
+                        <article class="stat-card">
+                            <span>Total Tasks</span>
+                            <h3 id="progressTotalTasks">0</h3>
+                        </article>
 
-                            <div class="stat-info">
-                                <span class="stat-label">Tasks Completed</span>
-                                <h3 id="progressCompletedTasks">0</h3>
-                            </div>
-                        </div>
+                        <article class="stat-card">
+                            <span>Completed Tasks</span>
+                            <h3 id="progressCompletedTasks">0</h3>
+                        </article>
 
-                        <div class="stat-card">
-                            <div class="stat-icon pink">
-                                <i data-lucide="heart"></i>
-                            </div>
+                        <article class="stat-card">
+                            <span>Pending Tasks</span>
+                            <h3 id="progressPendingTasks">0</h3>
+                        </article>
 
-                            <div class="stat-info">
-                                <span class="stat-label">Completion Rate</span>
-                                <h3 id="progressCompletionRate">0%</h3>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-icon green">
-                                <i data-lucide="calendar-check"></i>
-                            </div>
-
-                            <div class="stat-info">
-                                <span class="stat-label">Active Days</span>
-                                <h3 id="progressActiveDays">0</h3>
-                            </div>
-                        </div>
+                        <article class="stat-card">
+                            <span>Completion Rate</span>
+                            <h3 id="progressCompletionRate">0%</h3>
+                        </article>
 
                     </div>
 
 
-                    <!-- Weekly activity -->
-                    <div class="dashboard-card weekly-activity-card">
+                    <article class="content-card">
 
                         <div class="card-header">
                             <div>
-                                <h3>Weekly Activity</h3>
-                                <p>Your completed tasks this week</p>
+                                <h3>Overall Progress</h3>
+                                <p>Your productivity at a glance.</p>
                             </div>
                         </div>
 
                         <div
-                            id="weeklyChart"
-                            class="weekly-chart"
+                            id="progressOverview"
+                            class="progress-overview"
                         >
-                            <!-- Chart rendered by JavaScript -->
+                            <!-- Progress rendered by progress.js -->
                         </div>
 
-                    </div>
+                    </article>
 
 
-                    <!-- Achievements -->
-                    <div class="dashboard-card achievements-card">
+                    <article class="content-card">
 
                         <div class="card-header">
                             <div>
-                                <h3>Achievements</h3>
-                                <p>Celebrate your wins, big and small 🎀</p>
+                                <h3>Progress Details</h3>
+                                <p>Keep showing up for yourself.</p>
                             </div>
                         </div>
 
                         <div
-                            id="achievementsGrid"
-                            class="achievements-grid"
+                            id="progressDetails"
+                            class="progress-details"
                         >
-                            <!-- Achievements rendered here -->
+                            <!-- Progress details rendered by progress.js -->
                         </div>
 
-                    </div>
+                    </article>
 
                 </section>
 
 
-                <!-- ==========================================
-                     10. SETTINGS
-                     ========================================== -->
+                <!-- =========================================
+                     SETTINGS PAGE
+                ========================================== -->
+
                 <section
-                    class="page-content"
-                    id="settingsPage"
-                    data-page-content="settings"
+                    class="page-section"
+                    id="page-settings"
+                    data-page="settings"
                 >
 
-                    <div class="page-heading">
-
-                        <div>
-                            <p class="eyebrow">MAKE IT YOURS ♡</p>
-                            <h1>Settings</h1>
-
-                            <p class="page-description">
-                                Customize your little universe.
-                            </p>
-                        </div>
-
+                    <div class="section-intro">
+                        <h2>Settings <span>⚙</span></h2>
+                        <p>Make Velvet Day feel like your own space.</p>
                     </div>
 
 
                     <!-- Appearance settings -->
-                    <div class="dashboard-card settings-card">
+
+                    <article class="content-card">
 
                         <div class="card-header">
                             <div>
                                 <h3>Appearance</h3>
-                                <p>Choose your favorite atmosphere</p>
+                                <p>Customize how your planner looks.</p>
                             </div>
-
-                            <i data-lucide="palette"></i>
                         </div>
 
+                        <div class="form-group">
 
-                        <div class="settings-option">
+                            <label for="themeSelect">
+                                Theme
+                            </label>
 
-                            <div class="settings-option-info">
-                                <h4>Theme</h4>
-                                <p>Switch between light and dark mode.</p>
-                            </div>
+                            <select id="themeSelect">
+                                <option value="dark">Dark</option>
+                                <option value="light">Light</option>
+                            </select>
 
-                            <button
-                                type="button"
-                                class="secondary-button"
-                                data-theme-toggle
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="compactMode">
+                                Compact layout
+                            </label>
+
+                            <input
+                                type="checkbox"
+                                id="compactMode"
                             >
-                                <i data-lucide="sun"></i>
-                                Toggle Theme
-                            </button>
 
                         </div>
 
-                    </div>
+                    </article>
 
 
-                    <!-- Notification settings -->
-                    <div class="dashboard-card settings-card">
+                    <!-- Reminder settings -->
+
+                    <article class="content-card">
 
                         <div class="card-header">
                             <div>
-                                <h3>Notifications</h3>
-                                <p>Manage your reminder preferences</p>
+                                <h3>Reminder Preferences</h3>
+                                <p>Manage your reminder preferences.</p>
                             </div>
-
-                            <i data-lucide="bell"></i>
                         </div>
 
-                        <div class="settings-option">
+                        <div class="form-group">
 
-                            <div class="settings-option-info">
-                                <h4>Browser Notifications</h4>
-                                <p>Receive reminders from Velvet Day.</p>
-                            </div>
+                            <label for="remindersEnabled">
+                                Enable reminders
+                            </label>
 
-                            <button
-                                type="button"
-                                class="secondary-button"
-                                id="settingsNotificationButton"
+                            <input
+                                type="checkbox"
+                                id="remindersEnabled"
+                                checked
                             >
-                                Manage Permissions
-                            </button>
 
                         </div>
 
-                    </div>
+                        <div class="form-group">
+
+                            <label for="reminderTime">
+                                Default reminder time
+                            </label>
+
+                            <input
+                                type="time"
+                                id="reminderTime"
+                                value="09:00"
+                            >
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="weekStartsOn">
+                                Week starts on
+                            </label>
+
+                            <select id="weekStartsOn">
+                                <option value="monday">Monday</option>
+                                <option value="sunday">Sunday</option>
+                            </select>
+
+                        </div>
+
+                        <button
+                            type="button"
+                            id="saveSettings"
+                            class="primary-button"
+                        >
+                            Save Settings
+                        </button>
+
+                    </article>
 
 
                     <!-- Data management -->
-                    <div class="dashboard-card settings-card">
+
+                    <article class="content-card">
 
                         <div class="card-header">
                             <div>
-                                <h3>Your Data</h3>
-                                <p>Your data is stored locally in this browser.</p>
+                                <h3>Data & Backup</h3>
+                                <p>Your data is stored locally in your browser.</p>
                             </div>
-
-                            <i data-lucide="database"></i>
                         </div>
 
-
-                        <div class="settings-option">
-
-                            <div class="settings-option-info">
-                                <h4>Export Data</h4>
-                                <p>Download a backup of your planner.</p>
-                            </div>
+                        <div class="settings-actions">
 
                             <button
                                 type="button"
+                                id="exportData"
                                 class="secondary-button"
-                                id="exportDataButton"
                             >
-                                <i data-lucide="download"></i>
-                                Export
+                                Export Backup
                             </button>
 
-                        </div>
-
-
-                        <div class="settings-option">
-
-                            <div class="settings-option-info">
-                                <h4>Import Data</h4>
-                                <p>Restore your planner from a backup file.</p>
-                            </div>
-
-                            <button
-                                type="button"
-                                class="secondary-button"
-                                id="importDataButton"
+                            <label
+                                for="importData"
+                                class="secondary-button file-label"
                             >
-                                <i data-lucide="upload"></i>
-                                Import
-                            </button>
+                                Import Backup
+                            </label>
 
                             <input
                                 type="file"
-                                id="importDataInput"
+                                id="importData"
                                 accept=".json,application/json"
                                 hidden
                             >
 
                         </div>
 
-
-                        <div class="settings-option danger-option">
-
-                            <div class="settings-option-info">
-                                <h4>Reset Everything</h4>
-                                <p>Delete all your locally saved planner data.</p>
-                            </div>
-
-                            <button
-                                type="button"
-                                class="danger-button"
-                                id="resetDataButton"
-                            >
-                                <i data-lucide="trash-2"></i>
-                                Reset Data
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- About -->
-                    <div class="dashboard-card settings-card about-card">
-
-                        <div class="about-logo">
-                            ♡
-                        </div>
-
-                        <h3>Velvet Day</h3>
-
-                        <p>
-                            Your personal space to plan, dream and grow.
+                        <p
+                            id="storageInfo"
+                            class="settings-description"
+                        >
+                            Your data stays in this browser unless you export it.
                         </p>
 
-                        <span>Made with love ✦</span>
+                    </article>
 
-                    </div>
+                    <!-- App installation -->
+
+                    <article class="content-card">
+
+                        <div class="card-header">
+                            <div>
+                                <h3>Install Velvet Day</h3>
+                                <p>Add your planner to your device.</p>
+                            </div>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="primary-button"
+                            data-install-app
+                        >
+                            Install App
+                        </button>
+
+                        <p
+                            class="settings-description"
+                            data-pwa-status
+                        >
+                            Check whether Velvet Day can be installed.
+                        </p>
+
+                    </article>
 
                 </section>
 
 
-            </div><!-- End page-wrapper -->
-
-        </main><!-- End main-content -->
-
-
-        <!-- ==========================================
-             MOBILE BOTTOM NAVIGATION
-             ========================================== -->
-        <nav
-            class="mobile-bottom-navigation"
-            id="mobileBottomNavigation"
-            aria-label="Mobile navigation"
-        >
-
-            <button
-                type="button"
-                class="mobile-nav-item active"
-                data-page="dashboard"
-            >
-                <i data-lucide="house"></i>
-                <span>Home</span>
-            </button>
-
-            <button
-                type="button"
-                class="mobile-nav-item"
-                data-page="tasks"
-            >
-                <i data-lucide="list-check"></i>
-                <span>Tasks</span>
-            </button>
-
-            <button
-                type="button"
-                class="mobile-nav-item mobile-nav-add"
-                data-add-task
-                aria-label="Add task"
-            >
-                <i data-lucide="plus"></i>
-            </button>
-
-            <button
-                type="button"
-                class="mobile-nav-item"
-                data-page="calendar"
-            >
-                <i data-lucide="calendar-days"></i>
-                <span>Calendar</span>
-            </button>
-
-            <button
-                type="button"
-                class="mobile-nav-item"
-                data-page="brain"
-            >
-                <i data-lucide="brain"></i>
-                <span>Thoughts</span>
-            </button>
-
-        </nav>
-
-
-    </div><!-- End app-container -->
-
-
-    <!-- ==========================================
-         ADD / EDIT TASK MODAL
-         ========================================== -->
-    <div class="modal-overlay" id="taskModal">
-
-        <div class="modal task-modal">
-
-            <div class="modal-header">
-
-                <div>
-                    <p class="eyebrow">LET'S GET THINGS DONE ✨</p>
-                    <h2 data-task-modal-title>Add a New Task</h2>
-                </div>
-
-                <button
-                    type="button"
-                    class="icon-button"
-                    data-task-action="close"
-                    aria-label="Close modal"
-                >
-                    <i data-lucide="x"></i>
-                </button>
-
             </div>
+            <!-- END PAGE CONTAINER -->
 
-
-            <form id="taskForm">
-
-                <div class="form-group">
-
-                    <label for="taskTitle">
-                        Task Name <span class="required">*</span>
-                    </label>
-
-                    <input
-                        type="text"
-                        id="taskTitle"
-                        name="title"
-                        placeholder="What do you need to do?"
-                        maxlength="150"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="taskDescription">
-                        Description
-                    </label>
-
-                    <textarea
-                        id="taskDescription"
-                        name="description"
-                        placeholder="Add a few details..."
-                        rows="3"
-                    ></textarea>
-
-                </div>
-
-
-                <div class="form-row">
-
-                    <div class="form-group">
-
-                        <label for="taskCategory">Category</label>
-
-                        <select id="taskCategory" name="category">
-
-                            <option value="Personal">Personal</option>
-                            <option value="Work">Work</option>
-                            <option value="Study">Study</option>
-                            <option value="Health">Health</option>
-                            <option value="Career">Career</option>
-                            <option value="Shopping">Shopping</option>
-                            <option value="Other">Other</option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="taskPriority">Priority</label>
-
-                        <select id="taskPriority" name="priority">
-
-                            <option value="low">Low 🌱</option>
-                            <option value="medium" selected>Medium 🌸</option>
-                            <option value="high">High 🔥</option>
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="taskDueDate">Due Date</label>
-
-                    <input
-                        type="date"
-                        id="taskDueDate"
-                        name="dueDate"
-                    >
-
-                </div>
-
-
-                <div class="modal-footer">
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        data-task-action="close"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="primary-button"
-                    >
-                        <i data-lucide="check"></i>
-                        <span data-task-submit-text>Save Task</span>
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
+        </main>
+        <!-- END MAIN CONTENT -->
 
     </div>
+    <!-- END APPLICATION ROOT -->
 
 
-    <!-- ==========================================
-         ADD / EDIT NOTE MODAL
-         ========================================== -->
-    <div class="modal-overlay" id="noteModal">
+    <!-- =====================================================
+         GLOBAL SEARCH OVERLAY
+    ====================================================== -->
 
-        <div class="modal note-modal">
-
-            <div class="modal-header">
-
-                <div>
-                    <p class="eyebrow">A LITTLE NOTE ♡</p>
-                    <h2 id="noteModalTitle">Create a Note</h2>
-                </div>
-
-                <button
-                    type="button"
-                    class="icon-button"
-                    data-note-action="close"
-                    aria-label="Close modal"
-                >
-                    <i data-lucide="x"></i>
-                </button>
-
-            </div>
-
-
-            <form id="noteForm">
-
-                <div class="form-group">
-
-                    <label for="noteTitle">Title</label>
-
-                    <input
-                        type="text"
-                        id="noteTitle"
-                        name="title"
-                        placeholder="Give your note a title..."
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="noteContent">Your Note</label>
-
-                    <textarea
-                        id="noteContent"
-                        name="content"
-                        rows="8"
-                        placeholder="Write anything you want..."
-                        required
-                    ></textarea>
-
-                </div>
-
-
-                <div class="modal-footer">
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        data-note-action="close"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="primary-button"
-                    >
-                        <i data-lucide="save"></i>
-                        Save Note
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
-
-    <!-- ==========================================
-         CHECKLIST MODAL
-         ========================================== -->
-    <div class="modal-overlay" id="checklistModal">
-
-        <div class="modal checklist-modal">
-
-            <div class="modal-header">
-
-                <div>
-                    <p class="eyebrow">MAKE A LIST ✨</p>
-                    <h2 id="checklistModalTitle">New Checklist</h2>
-                </div>
-
-                <button
-                    type="button"
-                    class="icon-button"
-                    data-checklist-action="close"
-                    aria-label="Close modal"
-                >
-                    <i data-lucide="x"></i>
-                </button>
-
-            </div>
-
-
-            <form id="checklistForm">
-
-                <div class="form-group">
-
-                    <label for="checklistTitle">Checklist Name</label>
-
-                    <input
-                        type="text"
-                        id="checklistTitle"
-                        name="title"
-                        placeholder="e.g. Weekend packing list"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="checklistItems">
-                        Items
-                    </label>
-
-                    <textarea
-                        id="checklistItems"
-                        name="items"
-                        rows="8"
-                        placeholder="Enter one item per line..."
-                    ></textarea>
-
-                    <span class="form-helper">
-                        Write each item on a separate line.
-                    </span>
-
-                </div>
-
-
-                <div class="modal-footer">
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        data-checklist-action="close"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="primary-button"
-                    >
-                        <i data-lucide="check"></i>
-                        Save Checklist
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
-
-    <!-- ==========================================
-         RECURRING TASK MODAL
-         ========================================== -->
-    <div class="modal-overlay" id="recurringModal">
-
-        <div class="modal recurring-modal">
-
-            <div class="modal-header">
-
-                <div>
-                    <p class="eyebrow">BUILD A LITTLE ROUTINE 🌱</p>
-                    <h2 id="recurringModalTitle">New Routine</h2>
-                </div>
-
-                <button
-                    type="button"
-                    class="icon-button"
-                    data-recurring-action="close"
-                    aria-label="Close modal"
-                >
-                    <i data-lucide="x"></i>
-                </button>
-
-            </div>
-
-
-            <form id="recurringForm">
-
-                <div class="form-group">
-
-                    <label for="recurringTitle">Routine Name</label>
-
-                    <input
-                        type="text"
-                        id="recurringTitle"
-                        name="title"
-                        placeholder="e.g. Morning skincare"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="recurringFrequency">Frequency</label>
-
-                    <select
-                        id="recurringFrequency"
-                        name="frequency"
-                    >
-                        <option value="daily">Every day</option>
-                        <option value="weekly">Every week</option>
-                        <option value="monthly">Every month</option>
-                    </select>
-
-                </div>
-
-
-                <div class="form-group" id="recurringDaysGroup">
-
-                    <label>Days of the Week</label>
-
-                    <div class="recurring-days-selector">
-
-                        <label><input type="checkbox" name="days" value="1"> Mon</label>
-                        <label><input type="checkbox" name="days" value="2"> Tue</label>
-                        <label><input type="checkbox" name="days" value="3"> Wed</label>
-                        <label><input type="checkbox" name="days" value="4"> Thu</label>
-                        <label><input type="checkbox" name="days" value="5"> Fri</label>
-                        <label><input type="checkbox" name="days" value="6"> Sat</label>
-                        <label><input type="checkbox" name="days" value="0"> Sun</label>
-
-                    </div>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="recurringTime">Preferred Time (Optional)</label>
-
-                    <input
-                        type="time"
-                        id="recurringTime"
-                        name="time"
-                    >
-
-                </div>
-
-
-                <div class="modal-footer">
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        data-recurring-action="close"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="primary-button"
-                    >
-                        <i data-lucide="check"></i>
-                        Save Routine
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
-
-    <!-- ==========================================
-         REMINDER MODAL
-         ========================================== -->
-    <div class="modal-overlay" id="reminderModal">
-
-        <div class="modal reminder-modal">
-
-            <div class="modal-header">
-
-                <div>
-                    <p class="eyebrow">DON'T FORGET ♡</p>
-                    <h2 id="reminderModalTitle">New Reminder</h2>
-                </div>
-
-                <button
-                    type="button"
-                    class="icon-button"
-                    data-reminder-action="close"
-                    aria-label="Close modal"
-                >
-                    <i data-lucide="x"></i>
-                </button>
-
-            </div>
-
-
-            <form id="reminderForm">
-
-                <div class="form-group">
-
-                    <label for="reminderTitle">Reminder</label>
-
-                    <input
-                        type="text"
-                        id="reminderTitle"
-                        name="title"
-                        placeholder="What do you need to remember?"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="reminderDate">Date</label>
-
-                    <input
-                        type="date"
-                        id="reminderDate"
-                        name="date"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="reminderTime">Time</label>
-
-                    <input
-                        type="time"
-                        id="reminderTime"
-        name="time"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="reminderDescription">Description (Optional)</label>
-
-                    <textarea
-                        id="reminderDescription"
-                        name="description"
-                        rows="3"
-                        placeholder="Additional details..."
-                    ></textarea>
-
-                </div>
-
-
-                <div class="modal-footer">
-
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        data-reminder-action="close"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="primary-button"
-                    >
-                        <i data-lucide="bell"></i>
-                        Save Reminder
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
-
-    <!-- ==========================================
-         TOAST NOTIFICATION CONTAINER
-         ========================================== -->
     <div
-        class="toast-container"
+        class="search-overlay hidden"
+        id="searchOverlay"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Search Velvet Day"
+    >
+
+        <div class="search-dialog">
+
+            <div class="search-dialog-header">
+
+                <span class="search-icon">⌕</span>
+
+                <input
+                    type="search"
+                    id="globalSearch"
+                    placeholder="Search tasks, notes, checklists..."
+                    autocomplete="off"
+                    aria-label="Search your planner"
+                >
+
+                <button
+                    type="button"
+                    id="closeSearch"
+                    class="icon-button"
+                    aria-label="Close search"
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <div
+                id="searchResults"
+                class="search-results"
+            >
+                <p class="search-placeholder">
+                    Start typing to search your space.
+                </p>
+            </div>
+
+            <div class="search-footer">
+                <span>ESC to close</span>
+                <span>Search your Velvet Day</span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         GLOBAL TOAST CONTAINER
+    ====================================================== -->
+
+    <div
         id="toastContainer"
+        class="toast-container"
         aria-live="polite"
         aria-atomic="true"
     >
-        <!-- Toast messages dynamically generated -->
+        <!-- Toast messages created by toast.js -->
     </div>
 
 
-    <!-- ==========================================
-         CONFIRMATION MODAL
-         ========================================== -->
-    <div class="modal-overlay" id="confirmModal">
+    <!-- =====================================================
+         MOBILE SIDEBAR OVERLAY
+    ====================================================== -->
 
-        <div class="modal confirm-modal">
-
-            <div class="confirm-modal-icon">
-                <i data-lucide="alert-circle"></i>
-            </div>
-
-            <h2 id="confirmModalTitle">Are you sure?</h2>
-
-            <p id="confirmModalMessage">
-                This action cannot be undone.
-            </p>
-
-            <div class="modal-footer">
-
-                <button
-                    type="button"
-                    class="secondary-button"
-                    id="confirmCancelButton"
-                >
-                    Cancel
-                </button>
-
-                <button
-                    type="button"
-                    class="danger-button"
-                    id="confirmActionButton"
-                >
-                    Confirm
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
+    <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+    ></div>
 
 
-    <!-- ==========================================
+    <!-- =====================================================
          JAVASCRIPT FILES
-         Load them in this order
-         ========================================== -->
+         Keep this order because the application modules
+         depend on earlier files.
+    ====================================================== -->
 
-    <!-- Storage must load first -->
-    <script src="js/storage.js"></script>
+    <!-- Core utilities and storage -->
 
-    <!-- Shared helper functions -->
-    <script src="js/utils.js"></script>
+    <script src="./js/utils.js" defer></script>
+    <script src="./js/storage.js" defer></script>
 
-    <!-- Main app controller -->
-    <script src="js/app.js"></script>
+    <!-- Shared UI functionality -->
 
-    <!-- Theme management -->
-    <script src="js/theme.js"></script>
+    <script src="./js/toast.js" defer></script>
+    <script src="./js/theme.js" defer></script>
+    <script src="./js/navigation.js" defer></script>
 
-    <!-- Navigation -->
-    <script src="js/navigation.js"></script>
+    <!-- Feature modules -->
 
-    <!-- Task management -->
-    <script src="js/tasks.js"></script>
+    <script src="./js/tasks.js" defer></script>
+    <script src="./js/brain-dump.js" defer></script>
+    <script src="./js/notes.js" defer></script>
+    <script src="./js/checklists.js" defer></script>
+    <script src="./js/calendar.js" defer></script>
+    <script src="./js/recurring.js" defer></script>
+    <script src="./js/reminders.js" defer></script>
+    <script src="./js/progress.js" defer></script>
 
-    <!-- Brain dump -->
-    <script src="js/brain-dump.js"></script>
+    <!-- Application settings and utilities -->
 
-    <!-- Notes -->
-    <script src="js/notes.js"></script>
+    <script src="./js/settings.js" defer></script>
+    <script src="./js/search.js" defer></script>
+    <script src="./js/pwa.js" defer></script>
 
-    <!-- Checklists -->
-    <script src="js/checklist.js"></script>
+    <!-- Application entry points -->
 
-    <!-- Calendar -->
-    <script src="js/calendar.js"></script>
-
-    <!-- Recurring tasks -->
-    <script src="js/recurring.js"></script>
-
-    <!-- Reminders -->
-    <script src="js/reminders.js"></script>
-
-    <!-- Progress -->
-    <script src="js/progress.js"></script>
-
-    <!-- Lucide icon initialization -->
-    <script>
-        // Replace Lucide placeholders with actual SVG icons.
-        // This is also called after dynamically rendering content.
-        document.addEventListener("DOMContentLoaded", function () {
-            if (window.lucide) {
-                window.lucide.createIcons();
-            }
-        });
-    </script>
+    <script src="./js/app.js" defer></script>
+    <script src="./js/init.js" defer></script>
 
 </body>
-
 </html>
